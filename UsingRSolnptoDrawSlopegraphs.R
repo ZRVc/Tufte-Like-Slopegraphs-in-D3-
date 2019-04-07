@@ -1,4 +1,4 @@
-tufte2 <- TufteGovernment
+tufte2 <- TufteGovernment #TufteGovernment is the .csv in this repo.  It needs to be read into R.
 
 vec <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
 

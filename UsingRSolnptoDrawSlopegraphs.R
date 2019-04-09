@@ -1,4 +1,5 @@
-tufte2 <- TufteGovernment #TufteGovernment is the .csv in this repo.  It needs to be read into R.
+##TufteGovernment is the .csv in this repo.  It needs to be read into R.
+tufte2 <- TufteGovernment
 
 x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
 

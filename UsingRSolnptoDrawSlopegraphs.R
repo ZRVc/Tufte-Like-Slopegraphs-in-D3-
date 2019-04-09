@@ -1,23 +1,15 @@
 tufte2 <- TufteGovernment #TufteGovernment is the .csv in this repo.  It needs to be read into R.
 
-vec <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
-
-
-#ATTEMPT2
-x <- vec
-#keep in 
+x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
 
 x1 <- x[1:(length(x)/2)]
 x2 <- x[((length(x)/2)+1):length(x)]
 top <- max(x)
 
-
-
-#  for(i in 2:length(x1)){
-#    y1[i] <- y1[(i+1)]+24*(x1[(i-1)]-x1[i])
-#    if(y1[i] - y1[(i-1)] < 18) {
-#      y1[i] <- y1[i+1]+18
-#    }
+## This will set the slope so that a one percentage point decrease in GDP share
+## corresponds to a 24 point drop on the page.  For any ties, it adds 1 to the tie, 
+## so that (for this data at least) the minimum distance between two points is 1.  This
+## code will need to be adjusted for othe data sets.
 
 y1 <- 24*(top - x1)
 y2 <- (y1 - 24*(x2-x1))
@@ -29,9 +21,19 @@ for(i in 1:(length(y1)-1)) {
   }
 }
 
+## This will be the starting point in our search for an optimum solution.  I multiply 
+## everything by 18 so that the minimum distance is now 18 (which is the linespacing
+## I'm after).  This code needs to be adjusted to loop through the data and find the true
+## minimum distance between points, because we can't always assume it will be 1.
+
 start <- c(18*y1,18*y2)
 
 ###################################################
+## In this part, the functions used for RSolnp are being declared.
+
+## This is the function I'm trying to optimize.  The points from z are c(y1,y2)
+## from lines 15-23.  I put it within the function like this because I don't know
+## how to feed parameters to the function with RSolnp's syntax.  I'll fix this later.
 
 fn <- function(y){
   z <- c(252.0, 321.6, 333.6, 400.8, 441.6, 477.6, 532.8, 533.8, 540.0, 648.0,
@@ -40,6 +42,8 @@ fn <- function(y){
   return(sum((z - y)^2))
 }
 
+
+## This will set the equality constraints.  I want them all to have the same slope.
 
 eq1 <- function(y){
   y1 <- y[1:(length(y)/2)]
@@ -57,6 +61,9 @@ eq1 <- function(y){
   return(z[2:length(z)])
 }
 
+## This will set the inequality constraints.  I want the percentages to be in order for
+## each column.  I want the minimum distance between points to be 18.  If possible,
+## each point should be closest to the point whose x-value is closest.
 
 ineq1 <- function(y) {
   x1 <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,
@@ -71,10 +78,10 @@ ineq1 <- function(y) {
       w <- -y1[i] + y1[j]
       z1 <- append(z1,w,after = length(z1))
     }
-    # if(x1[i] > min(x1) && x1[i] < max(x1)){
-    #   upper <- min(y1[which(x1 < x1[i])])
-    #   lower <- max(y1[which(x1 > x1[i])])
-    #   y1low <- which(y1 == lower) 
+    # if(x1[i] > min(x1) && x1[i] < max(x1)){             ## This loop sets each point's y1 value
+    #   upper <- min(y1[which(x1 < x1[i])])               ## closer to one with the closer x1 value
+    #   lower <- max(y1[which(x1 > x1[i])])               ## it wasn't producing a solution, so
+    #   y1low <- which(y1 == lower)                       ## got commented out.
     #   y1high <- which(y1 == upper)
     #   for(k in y1low){
     #     for(m in y1high){
@@ -121,6 +128,8 @@ ineq1 <- function(y) {
   return(c(z1[2:length(z1)],z2[2:length(z2)]))
 }  
 
+
+## This function is the same as the last (ineq1), but the values it returns are the lower bounds I want
 bounder <- function(y) {
   x1 <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,
           26.5, 22.5, 20.7)
@@ -184,13 +193,12 @@ bounder <- function(y) {
   return(c(z1[2:length(z1)],z2[2:length(z2)]))
 }  
 
-
-lbounds <- bounder(start)
-
-
+###########################################################
+## Using Rsolnp to set the points:
 library(Rsolnp)
 s1 <- eq1(start)
 s <- ineq1(start)
+lbounds <- bounder(start)
 
 sol <- solnp(start,fun=fn,eqfun=eq1,eqB=rep((10^-6),length(s1)),
              ineqfun=ineq1,ineqLB=lbounds,ineqUB=rep(30000,length(lbounds)))

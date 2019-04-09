@@ -1,4 +1,5 @@
-##TufteGovernment is the .csv in this repo.  It needs to be read into R.
+## The package "Rsolnp" needs to be installed.
+## TufteGovernment is the .csv in this repo.  It needs to be read into R.
 tufte2 <- TufteGovernment
 
 x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
@@ -10,7 +11,7 @@ top <- max(x)
 ## This will set the slope so that a one percentage point decrease in GDP share
 ## corresponds to a 24 point drop on the page.  For any ties, it adds 1 to the tie, 
 ## so that (for this data at least) the minimum distance between two points is 1.  This
-## code will need to be adjusted for othe data sets.
+## code will need to be adjusted for other data sets.
 
 y1 <- 24*(top - x1)
 y2 <- (y1 - 24*(x2-x1))
@@ -62,8 +63,9 @@ eq1 <- function(y){
 }
 
 ## This will set the inequality constraints.  I want the percentages to be in order for
-## each column.  I want the minimum distance between points to be 18.  If possible,
-## each point should be closest to the point whose x-value is closest.
+## each column (it is assumed that the first column is already in order).  I want the 
+## minimum distance between points to be 18.  If possible, each point should be
+## closest to the point whose x-value is closest.
 
 ineq1 <- function(y) {
   x1 <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,

@@ -24,8 +24,7 @@ for(i in 1:(length(y1)-1)) {
 
 ## This will be the starting point in our search for an optimum solution.  I multiply 
 ## everything by 18 so that the minimum distance is now 18 (which is the linespacing
-## I'm after).  This code needs to be adjusted to loop through the data and find the true
-## minimum distance between points, because we can't always assume it will be 1.
+## I'm after).  This code will need to be adjusted to use an arbitrary minimum.
 
 start <- c(18*y1,18*y2)
 

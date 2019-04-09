@@ -203,3 +203,9 @@ lbounds <- bounder(start)
 sol <- solnp(start,fun=fn,eqfun=eq1,eqB=rep((10^-6),length(s1)),
              ineqfun=ineq1,ineqLB=lbounds,ineqUB=rep(30000,length(lbounds)))
 round(sol$pars-min(sol$pars),1)
+
+## Check the slopes:
+y1Solve <- round(sol$pars-min(sol$pars),1)[1:(length(sol$pars)/2)]
+y2Solve <- round(sol$pars-min(sol$pars),1)[(length(sol$pars)/2+1):length(sol$pars)]
+
+(y2Solve-y1Solve)/(x2-x1)

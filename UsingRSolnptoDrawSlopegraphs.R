@@ -11,9 +11,9 @@ x2 <- x[((length(x)/2)+1):length(x)]
 top <- max(x)
 
 ## This will set the slope so that a one percentage point decrease in GDP share
-## corresponds to a 24 point drop on the page.  For any ties, it adds 1 to the tie, 
-## so that (for this data at least) the minimum distance between two points is 1.  This
-## code will need to be adjusted for other data sets.
+## corresponds to a 24 point drop on the page.  If there's a tie, it adds 1 to  
+## one of them, so that (for this data at least) the minimum distance between 
+## two points is 1.  This code will need to be adjusted for other data sets.
 
 y1 <- 24*(top - x1)
 y2 <- (y1 - 24*(x2-x1))

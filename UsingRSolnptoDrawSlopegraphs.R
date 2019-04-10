@@ -1,3 +1,4 @@
+## Get the data
 tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/42095cdaf56e02762fbb785fea86c9d1b0fadd3d/TufteGovernment.csv")
 
 ## The package "Rsolnp" needs to be installed.

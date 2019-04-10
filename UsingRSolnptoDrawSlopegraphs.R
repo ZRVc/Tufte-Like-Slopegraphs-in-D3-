@@ -1,6 +1,7 @@
+tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/42095cdaf56e02762fbb785fea86c9d1b0fadd3d/TufteGovernment.csv")
+
 ## The package "Rsolnp" needs to be installed.
-## TufteGovernment is the .csv in this repo.  It needs to be read into R.
-tufte2 <- TufteGovernment
+## install.packages("Rsolnp")
 
 x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
 

@@ -10,7 +10,6 @@ body {
   font-size: 11pt;
   color: "black";
 }
-
 </style>
 
 <body>
@@ -21,7 +20,6 @@ body {
 
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
-
 	var slopecoef = 3.3;
 	var colspace = 90;
 	var blockspace = 24;
@@ -32,7 +30,6 @@ body {
 	var headerv = -10;
 	var headerlinev = -19;
 	var titlev = -50;
-
 d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/TufteSurvivalRates.csv")
 	.then(function(data){
 		data.forEach(function(d) {
@@ -46,8 +43,6 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 	var nrow = data.length;
 		
 	
-
-
 	
 	var vLast = Array(keys.length).fill(0);
 	
@@ -67,16 +62,12 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 					})
 					.attr('y', headerv)
 					.text(keys[m]);
-
 	var bbox3 = headtest.node().getBBox();
 	bbox.push(bbox3.x)
 	bbox2.push(bbox3.width)
 	
 	d3.select("svg .nums").selectAll("text").remove();
 	}
-
-
-
 	var nums = d3.select("svg .nums")
 		.selectAll("text")
 	
@@ -99,8 +90,6 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 				.style("text-anchor", "middle")
 			;
 	
-
-
 for (var j = 0; j < nrow; j++) {  
 		var w = d3.values(data[j]);
 		var w1 = d3.values(data[j]);
@@ -197,7 +186,6 @@ for (var j = 0; j < nrow; j++) {
 										});
 									
 };
-
 			nums.data(bbox)
 				.enter()
 				.append("line")
@@ -219,10 +207,10 @@ for (var j = 0; j < nrow; j++) {
 				.append("text")
 				.style("text-anchor", "middle")
 				.style("font-size", "14pt")
+				.style(color = d3.rgb("#141414"))
 				.text("Estimates of % survival rates")
 				.attr("x", (colspace+(keys.length-1)*colspace+2*rowlabelspace)/2)
 				.attr("y", titlev);
-
 })
 			
   </script>

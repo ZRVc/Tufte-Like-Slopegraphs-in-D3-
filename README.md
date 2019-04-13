@@ -12,7 +12,7 @@ The graph of GDPs (Bembo style) was harder, because I had to figure out a way to
 
 [First version](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteBemboStyle.html)
 
-[with a larger slope for better spacing between the points](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteBembo36ptDrop.html)
+[With a larger slope for better spacing between the points](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteBembo36ptDrop.html)
 
 
 ### Survival rates slopegraph:

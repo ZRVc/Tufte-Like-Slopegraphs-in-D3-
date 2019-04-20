@@ -11,6 +11,7 @@ body {
   color: 'black';
   font-variant-numeric: oldstyle-nums;
 }
+
 </style>
 
 <body>
@@ -21,6 +22,7 @@ body {
 
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
+
     var slopecoef = 24;
     var colspace = 230;
     var blockspace = 18;
@@ -31,6 +33,7 @@ body {
     var headerv = -10;
     var headerlinev = -19;
     var titlev = -50;
+
 d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/TufteGovernment.csv")
     .then(function(data){
         
@@ -49,6 +52,7 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
     
     var keys = d3.keys(data[0]);
     var nrow = data.length;
+
     var nums = d3.select("svg .nums")
         .selectAll("text");
     
@@ -74,7 +78,7 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
                 .style("text-anchor", "middle")
             ;
     
-//These points were gotten from the Rscript:
+//These points were got from the Rscript:
 	var v1 = [359.8,  463.1,  483.8,  593.6,  629.1,  699.4,  770.4,  788.4,  806.4,  967.5,  985.5, 1084.4, 1102.4,
 1243.3, 1307.0];
 	var v2 = [0.0,   58.7,  185.6,  651.8,  478.3,  514.4,  496.3,  767.9,  693.4, 785.9,  910.1,
@@ -140,8 +144,10 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 								return vNew[(i+1)]+linevspace;
 								}
 										});
+
                                     
 }
+
 })
             
   </script>

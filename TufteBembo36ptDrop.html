@@ -9,7 +9,7 @@ body {
   font-family: "Bembo Std", serif;
   font-size: 12pt;
   color: 'black';
-  font-variant-numeric: "oldstyle-nums";
+  font-variant-numeric: oldstyle-nums;
 }
 </style>
 
@@ -100,7 +100,10 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
                     return vNew[i];            
                 })
             .text(function(d, i) {
-                return wNew[i];
+				if (i === 1 || i === 2) {
+                return (Math.round(wNew[i] * 10) / 10).toFixed(1);
+				} else { return wNew[i];
+				}
             })
             .style("text-anchor", function(d, i) {
                                 if (i === 0) {

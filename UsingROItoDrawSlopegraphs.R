@@ -109,7 +109,6 @@ ineq1 <- function(y) {
   return(unname(u[2:dim(u)[1],]))
 }
 
-
 ineq2 <- function(y) {
   x1 <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,
           26.5, 22.5, 20.7)
@@ -117,6 +116,47 @@ ineq2 <- function(y) {
           33.2, 27.1, 26.6)
   
   y1 <- y[1:(length(y)/2)]
+  
+  u <- rep(0,30)
+  
+  for(i in 1:(length(y)/2)) {
+    if(x1[i] > min(x1) && x1[i] < max(x1)){
+      upper <- min(y1[which(x1 < x1[i])])
+      lower <- max(y1[which(x1 > x1[i])])
+      y1low <- which(y1 == lower)
+      y1high <- which(y1 == upper)
+      for(k in y1low){
+        for(m in y1high){
+          if(x1[i] - x1[m] > x1[k] - x1[i]) {
+            w <- rep(0,15)
+            w[m] <- 1
+            w[k] <- 1
+            w[i] <- -2
+            w1 <- c(w,rep(0,15))
+            u <- rbind(u,w1)
+          }
+          if(x1[i] - x1[m] < x1[k] - x1[i]) {
+            w <- rep(0,15)
+            w[m] <- -1
+            w[k] <- -1
+            w[i] <- 2
+            w1 <- c(w,rep(0,15))
+            u <- rbind(u,w1)
+          }
+        }
+      }
+    }
+  }
+  return(unname(u[2:dim(u)[1],]))
+}
+
+
+ineq3 <- function(y) {
+  x1 <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,
+          26.5, 22.5, 20.7)
+  x2 <- c(57.4, 55.8, 52.2, 39.0, 43.4, 42.9, 43.2, 35.8, 38.2, 35.7, 32.5, 30.6,
+          33.2, 27.1, 26.6)
+  
   y2 <- y[(length(y)/2+1):length(y)]
   
   u <- rep(0,30)
@@ -153,7 +193,7 @@ ineq2 <- function(y) {
 }
 
 
-ineq <- rbind(ineq0(start1),ineq0(start1),ineq1(start1),ineq2(start1))
+ineq <- rbind(ineq0(start1),ineq0(start1),ineq1(start1),ineq3(start1))
 
 lc <- L_constraint(L=ineq, dir=c(rep(">=",14),rep("<=",14),rep(">=",210),rep(">=",13)),
              rhs=c(rep(-0.01,14),rep(0.01,14),rep(18,210),rep(0,13)))

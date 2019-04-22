@@ -4,6 +4,7 @@ tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegrap
 ## The package "ROI" needs to be installed.
 ## install.packages("ROI")
 ## install.packages("alabama")
+## install.packages("numDeriv")
 ## install.packages("ROI.plugin.alabama")
 
 library(ROI)

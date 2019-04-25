@@ -115,7 +115,7 @@ ineq1 <- function(y) {
 
 ## Third set of constraints:  Except for the endpoints, every number is between two
 ## other numbers.  The in-between number's positioning should be closer to whichever 
-## of the two is numbers is closer.  I.e., if 37.5 is between 39.0 and 35.2, it should
+## of the two numbers is closer.  I.e., if 37.5 is between 39.0 and 35.2, it should
 ## be positioned closer to 39.0, because 39.0 - 37.5 < 37.5 - 35.2.  This constraint 
 ## is for the first column.  It isn't used in the solution.
 ineq2 <- function(y,x1=x1.1,x2=x2.1) {

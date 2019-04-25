@@ -12,8 +12,8 @@ library(ROI.plugin.alabama)
 
 x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
 
-x1 <- x[1:(length(x)/2)]
-x2 <- x[((length(x)/2)+1):length(x)]
+x1.1 <- x[1:(length(x)/2)]
+x2.1 <- x[((length(x)/2)+1):length(x)]
 
 ## space sets the linespacing.  It is the minimum distance between labels.
 ## drop controls the slope.
@@ -22,12 +22,12 @@ space <- 18
 drop <- 24
 
 ## This will set the slope so that a one percentage point decrease in GDP share
-## corresponds to a 24 point drop on the page.  If there's a tie, it adds 1 to  
+## corresponds to a 24 pixel drop on the page.  If there's a tie, it adds 1 to  
 ## one of them, so that (for this data at least) the minimum distance between 
 ## two points is 1.  This code will need to be adjusted for other data sets.
 
-y1 <- drop*(max(x) - x1)
-y2 <- (y1 - drop*(x2-x1))
+y1 <- drop*(max(x) - x1.1)
+y2 <- (y1 - drop*(x2.1-x1.1))
 
 for(i in 1:(length(y1)-1)) {
   if(y1[i] == y1[(i+1)]) {
@@ -36,9 +36,11 @@ for(i in 1:(length(y1)-1)) {
   }
 }
 
+z <- c(y1,y2)
+
 ## This will be the starting point in our search for an optimum solution.  I multiply 
-## everything by 18 so that the minimum distance is now 18 (which is the linespacing
-## I'm after).  This code will need to be adjusted to use an arbitrary minimum.
+## everything by "space" so that the minimum distance is now the linespacing I'm
+## after.
 
 start1 <- c(space*y1,space*y2)
 
@@ -46,46 +48,48 @@ start1 <- c(space*y1,space*y2)
 ## In this part, the functions used for optimization are being declared.
 
 ## This is the function I'm trying to optimize.
-
-fn <- function(y){
-  z <- c(252.0, 321.6, 333.6, 400.8, 441.6, 477.6, 532.8, 533.8, 540.0, 648.0,
-         650.4, 734.4, 741.6, 837.6, 880.8, 0.0, 38.4, 124.8, 441.6, 336.0, 348.0, 340.8, 519.4, 460.8, 520.8,
-         597.6, 643.2, 580.8, 727.2, 739.2)
-  return(sum((z - y)^2))
+fn1 <- function(v,z=z){
+  return(sum((z-v)^2))
 }
 
-gr <- function(y){
-  z <- c(252.0, 321.6, 333.6, 400.8, 441.6, 477.6, 532.8, 533.8, 540.0, 648.0,
-         650.4, 734.4, 741.6, 837.6, 880.8, 0.0, 38.4, 124.8, 441.6, 336.0, 348.0, 340.8, 519.4, 460.8, 520.8,
-         597.6, 643.2, 580.8, 727.2, 739.2)
-  return(2*y-2*z)
+gr1 <- function(v,z=z){
+  return(2*v-2*z)
 }
 
+## Wrapper functions to work with ROI
+fn <- function(y) {
+  return(fn1(y,z))
+}
 
-ineq0 <- function(y) {
-  x <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,
-          26.5, 22.5, 20.7, 57.4, 55.8, 52.2, 39.0, 43.4, 42.9, 43.2, 35.8, 38.2, 35.7, 32.5, 30.6,
-          33.2, 27.1, 26.6)
+gr <- function(y) {
+  return(gr1(y,z))
+}
 
+## First set of constraints: ensure that the slopes are drawn on the same scale.
+ineq0 <- function(y,x1=x1.1,x2=x2.1) {
+  x <- c(x1,x2)
+  
   u <- rep(0,30)
-
+  
   for(i in 1:(length(y)/2-1)) {
     w <- rep(0,30)
     w[i] <- 1/(x[i]-x[(i+15)])
     w[(i+1)] <- -1/(x[(i+1)]-x[(i+16)])
     w[(i+15)] <- -1/(x[i]-x[(i+15)])
     w[(i+16)] <- 1/(x[(i+1)]-x[(i+16)])
-        
+    
     u <- rbind(u,w)
   }
   return(unname(u[2:dim(u)[1],]))
 }
 
+## Second set of constraints: ensure that the numbers are displayed in order with the 
+## correct linespacing.
 ineq1 <- function(y) {
-
+  
   y1 <- y[1:(length(y)/2)]
   y2 <- y[(length(y)/2+1):length(y)]
-
+  
   u <- rep(0,30)
   
   for(i in 1:(length(y1)-1)) {
@@ -109,12 +113,13 @@ ineq1 <- function(y) {
   return(unname(u[2:dim(u)[1],]))
 }
 
-ineq2 <- function(y) {
-  x1 <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,
-          26.5, 22.5, 20.7)
-  x2 <- c(57.4, 55.8, 52.2, 39.0, 43.4, 42.9, 43.2, 35.8, 38.2, 35.7, 32.5, 30.6,
-          33.2, 27.1, 26.6)
-  
+## Third set of constraints:  Except for the endpoints, every number is between two
+## other numbers.  The in-between number's positioning should be closer to whichever 
+## of the two is numbers is closer.  I.e., if 37.5 is between 39.0 and 35.2, it should
+## be positioned closer to 39.0, because 39.0 - 37.5 < 37.5 - 35.2.  This constraint 
+## is for the first column.  It isn't used in the solution.
+ineq2 <- function(y,x1=x1.1,x2=x2.1) {
+
   y1 <- y[1:(length(y)/2)]
   
   u <- rep(0,30)
@@ -150,12 +155,9 @@ ineq2 <- function(y) {
   return(unname(u[2:dim(u)[1],]))
 }
 
-
-ineq3 <- function(y) {
-  x1 <- c(46.9, 44.0, 43.5, 40.7, 39.0, 37.5, 35.2, 35.2, 34.9, 30.4, 30.3, 26.8,
-          26.5, 22.5, 20.7)
-  x2 <- c(57.4, 55.8, 52.2, 39.0, 43.4, 42.9, 43.2, 35.8, 38.2, 35.7, 32.5, 30.6,
-          33.2, 27.1, 26.6)
+## Fourth set of constraints:  This is the same as the third constraint, but it's for
+## the second column.
+ineq3 <- function(y,x1=x1.1,x2=x2.1) {
   
   y2 <- y[(length(y)/2+1):length(y)]
   
@@ -192,11 +194,12 @@ ineq3 <- function(y) {
   return(unname(u[2:dim(u)[1],]))
 }
 
+##################################  SOLVING  #########################################
 
 ineq <- rbind(ineq0(start1),ineq0(start1),ineq1(start1),ineq3(start1))
 
 lc <- L_constraint(L=ineq, dir=c(rep(">=",14),rep("<=",14),rep(">=",210),rep(">=",13)),
-             rhs=c(rep(-0.01,14),rep(0.01,14),rep(18,210),rep(0,13)))
+                   rhs=c(rep(-0.01,14),rep(0.01,14),rep(18,210),rep(0,13)))
 
 fo <-  F_objective(F=fn,n=30,G=gr)
 

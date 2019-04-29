@@ -2,10 +2,10 @@
 tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/42095cdaf56e02762fbb785fea86c9d1b0fadd3d/TufteGovernment.csv")
 
 ## The package "ROI" needs to be installed.
-## install.packages("ROI")
-## install.packages("alabama")
-## install.packages("numDeriv")
-## install.packages("ROI.plugin.alabama")
+# install.packages("ROI")
+# install.packages("alabama")
+# install.packages("numDeriv")
+# install.packages("ROI.plugin.alabama")
 
 library(ROI)
 library(ROI.plugin.alabama)
@@ -18,7 +18,7 @@ x2.1 <- x[((length(x)/2)+1):length(x)]
 ## space sets the linespacing.  It is the minimum distance between labels.
 ## drop controls the slope.
 
-space <- 18
+space <- 16
 drop <- 24
 
 ## This will set the slope so that a one percentage point decrease in GDP share
@@ -117,9 +117,10 @@ ineq1 <- function(y) {
 ## other numbers.  The in-between number's positioning should be closer to whichever 
 ## of the two numbers is closer.  I.e., if 37.5 is between 39.0 and 35.2, it should
 ## be positioned closer to 39.0, because 39.0 - 37.5 < 37.5 - 35.2.  This constraint 
-## is for the first column.  It isn't used in the solution.
+## is for the first column.  It isn't used in the solution because I'm trying to 
+## keep the size the same as Tufte's.
 ineq2 <- function(y,x1=x1.1,x2=x2.1) {
-
+  
   y1 <- y[1:(length(y)/2)]
   
   u <- rep(0,30)
@@ -199,15 +200,29 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
 ineq <- rbind(ineq0(start1),ineq0(start1),ineq1(start1),ineq3(start1))
 
 lc <- L_constraint(L=ineq, dir=c(rep(">=",14),rep("<=",14),rep(">=",210),rep(">=",13)),
-                   rhs=c(rep(-0.01,14),rep(0.01,14),rep(18,210),rep(0,13)))
+                   rhs=c(rep(-0.0001,14),rep(0.0001,14),rep(space,210),rep(0,13)))
 
 fo <-  F_objective(F=fn,n=30,G=gr)
 
 prob <- OP(fo,lc)
 sol <- ROI_solve(prob,solver="alabama",start=start1)
 
-## The points
-round(solution(sol)-min(solution(sol)),1)
+## The points (formatted for easy pasting into D3)
+points0 <- round(solution(sol)-min(solution(sol)),1)
+
+points1 <- points0[1]
+for(i in 2:(length(points0)/2)) {
+  points1 <- paste(points1,points0[i],sep = ", ")
+}
+
+
+points2 <- points0[(length(points0)/2+1)]
+for(i in (length(points0)/2+2):length(points0)) {
+  points2 <- paste(points2,points0[i],sep = ", ")
+}
+
+points1
+points2
 
 ## Check the slopes
 y1Solve <- round(solution(sol)-min(solution(sol)),1)[1:(length(solution(sol))/2)]

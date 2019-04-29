@@ -6,12 +6,10 @@
 
 <style>
 body {
-  font-family: "Bembo Std", serif;
-  font-size: 12pt;
-  color: 'black';
+  font-family: Bembo Std, serif;
+  font-size: 11pt;
   font-variant-numeric: oldstyle-nums;
 }
-
 </style>
 
 <body>
@@ -22,18 +20,16 @@ body {
 
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
-
     var slopecoef = 24;
-    var colspace = 230;
+    var colspace = 225;
     var blockspace = 18;
-    var linehspace = 25;
+    var linehspace = 24;
     var linevspace = 0;
-    var rowlabelspace = -200;
-    var collabelspace = -35;
+    var rowlabelspace = 25;
+    var collabelspace = -43;
     var headerv = -10;
     var headerlinev = -19;
     var titlev = -50;
-
 d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/TufteGovernment.csv")
     .then(function(data){
         
@@ -52,7 +48,6 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
     
     var keys = d3.keys(data[0]);
     var nrow = data.length;
-
     var nums = d3.select("svg .nums")
         .selectAll("text");
     
@@ -63,7 +58,7 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
                 .attr("x", function(d, i) {
                                 if (i === 0) {
                                 return i*colspace;} else {
-                                return i*colspace+rowlabelspace;
+                                return (i-1)*colspace+rowlabelspace;
                                 }
                 })
                 .attr("y", function(d, i) {
@@ -76,11 +71,13 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 				}
                 })
                 .style("text-anchor", "middle")
+				.style("fill", "blue")
+				.style("font-size", "12pt")
             ;
     
-//These points were gotten from the Rsolnp Rscript:
-	var v1 = [230.8, 297.7, 315.7, 385.7, 403.7, 461.8, 500.9, 518.9, 536.9, 640.2, 658.2, 716.3,734.3, 820.0, 866.6];
-	var v2 = [0.0,  38.3, 124.4, 423.1, 307.0, 343.1, 325.0, 505.7, 464.3,523.7, 609.8, 632.8, 587.0, 718.9, 736.9];
+//These points were gotten from the ROI Rscript:
+	var v1 = [234.7, 302.5, 318.5, 392.8, 408.8, 464.5, 505.2, 521.2, 537.2, 642.3, 658.3, 718.5, 734.5, 823.7, 868.8];
+	var v2 = [0, 38.7, 124, 430.8, 310.4, 343.8, 326.4, 507.8, 463.5, 523.8, 609.1, 633.5, 584.7, 720.9, 736.9];
     
      
     for (j = 0; j < v1.length; j++) {
@@ -93,9 +90,9 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
             .append("text")
             .attr("x", function(d, i) {
                                 if (i === 0) {
-                                return i*colspace} else if (i < 3) {
-                                return i*colspace+rowlabelspace;
-                                } else {return i*colspace+2*rowlabelspace;
+                                return 0} else if (i < 3) {
+                                return (i-1)*colspace+rowlabelspace;
+                                } else {return (i-2)*colspace+2*rowlabelspace;
 				}
                 })
             .attr("y", function(d, i) {
@@ -115,16 +112,17 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 				}
                     })
             .attr("dominant-baseline", "middle")
+			.style("fill", "blue")
             ;
             
 			nums.data(vNew)
 			.enter()
 			.append('line')
-			.style('stroke', d3.rgb("#b6b6b6"))
+			.style('stroke', d3.rgb("#0000FF"))
 			.attr('stroke-width', 1)
 			.attr('x1', function(d, i) {
 								if (i > 0 && i < keys.length-1) {
-								return (i)*colspace+rowlabelspace+linehspace;
+								return (i-1)*colspace+rowlabelspace+linehspace;
 								}
 										})
 			.attr('y1', function(d, i) {
@@ -134,7 +132,7 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 										})
 			.attr('x2', function(d, i) {
 								if (i > 0 && i < keys.length-1) {
-								return (i+1)*colspace+rowlabelspace-linehspace;
+								return (i)*colspace+rowlabelspace-linehspace;
 								}
 										})
 			.attr('y2', function(d, i) {
@@ -142,10 +140,8 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 								return vNew[(i+1)]+linevspace;
 								}
 										});
-
                                     
 }
-
 })
             
   </script>

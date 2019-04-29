@@ -16,6 +16,14 @@ The graph of GDPs (Bembo style) was harder, because I had to figure out a way to
 
 [With a giant slope and bigger text](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteBembo44space64drop.html)
 
+### Tufte's vs Mine side-by-side:
+
+![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
+
+### Tufte's vs Mine Overlay:
+
+![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png "Overlay")
+
 ### Survival rates slopegraph:
 
 [Survival Rates](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteGillSansStyle.html)

@@ -71,7 +71,7 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 				}
                 })
                 .style("text-anchor", "middle")
-				.style("fill", "blue")
+				.style("fill", d3.rgb("#35979e"))
 				.style("font-size", "12pt")
             ;
     
@@ -112,13 +112,13 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 				}
                     })
             .attr("dominant-baseline", "middle")
-			.style("fill", "blue")
+			.style("fill", d3.rgb("#35979e"))
             ;
             
 			nums.data(vNew)
 			.enter()
 			.append('line')
-			.style('stroke', d3.rgb("#0000FF"))
+			.style('stroke', d3.rgb("#35979e"))
 			.attr('stroke-width', 1)
 			.attr('x1', function(d, i) {
 								if (i > 0 && i < keys.length-1) {

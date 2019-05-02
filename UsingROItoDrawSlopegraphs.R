@@ -199,10 +199,17 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
 
 ineq <- rbind(ineq0(start1),ineq0(start1),ineq1(start1),ineq3(start1))
 
-lc <- L_constraint(L=ineq, dir=c(rep(">=",14),rep("<=",14),rep(">=",210),rep(">=",13)),
-                   rhs=c(rep(-0.0001,14),rep(0.0001,14),rep(space,210),rep(0,13)))
+boundsl0 <- length(ineq0(start1)[,1])
+boundsl1 <- length(ineq1(start1)[,1])
+boundsl2 <- length(ineq2(start1)[,1])
+boundsl3 <- length(ineq3(start1)[,1])
 
-fo <-  F_objective(F=fn,n=30,G=gr)
+lc <- L_constraint(L=ineq, dir=c(rep(">=",boundsl0),rep("<=",boundsl0),
+                                 rep(">=",boundsl1),rep(">=",boundsl3)),
+                   rhs=c(rep(-0.0001,boundsl0),rep(0.0001,boundsl0),
+                         rep(space,boundsl1),rep(0,boundsl3)))
+
+fo <-  F_objective(F=fn,n=length(start1),G=gr)
 
 prob <- OP(fo,lc)
 sol <- ROI_solve(prob,solver="alabama",start=start1)
@@ -228,4 +235,4 @@ points2
 y1Solve <- round(solution(sol)-min(solution(sol)),1)[1:(length(solution(sol))/2)]
 y2Solve <- round(solution(sol)-min(solution(sol)),1)[(length(solution(sol))/2+1):length(solution(sol))]
 
-(y2Solve-y1Solve)/(x2-x1)
+(y2Solve-y1Solve)/(x2.1-x1.1)

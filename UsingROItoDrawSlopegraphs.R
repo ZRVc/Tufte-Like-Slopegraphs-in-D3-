@@ -1,4 +1,4 @@
-## Get the data
+# Get the data
 tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/42095cdaf56e02762fbb785fea86c9d1b0fadd3d/TufteGovernment.csv")
 
 ## The package "ROI" needs to be installed.
@@ -69,14 +69,14 @@ gr <- function(y) {
 ineq0 <- function(y,x1=x1.1,x2=x2.1) {
   x <- c(x1,x2)
   
-  u <- rep(0,30)
+  u <- rep(0,length(y))
   
   for(i in 1:(length(y)/2-1)) {
-    w <- rep(0,30)
-    w[i] <- 1/(x[i]-x[(i+15)])
-    w[(i+1)] <- -1/(x[(i+1)]-x[(i+16)])
-    w[(i+15)] <- -1/(x[i]-x[(i+15)])
-    w[(i+16)] <- 1/(x[(i+1)]-x[(i+16)])
+    w <- rep(0,length(y))
+    w[i] <- 1/(x[i]-x[(i+(length(y)/2))])
+    w[(i+1)] <- -1/(x[(i+1)]-x[(i+(length(y)/2+1))])
+    w[(i+(length(y)/2))] <- -1/(x[i]-x[(i+(length(y)/2))])
+    w[(i+(length(y)/2+1))] <- 1/(x[(i+1)]-x[(i+(length(y)/2+1))])
     
     u <- rbind(u,w)
   }
@@ -90,11 +90,11 @@ ineq1 <- function(y) {
   y1 <- y[1:(length(y)/2)]
   y2 <- y[(length(y)/2+1):length(y)]
   
-  u <- rep(0,30)
+  u <- rep(0,length(y))
   
   for(i in 1:(length(y1)-1)) {
     for(j in (i+1):(length(y1))) {
-      w <- rep(0,30)
+      w <- rep(0,length(y))
       w[i] <- -1
       w[j] <- 1
       u <- rbind(u,w)
@@ -104,9 +104,9 @@ ineq1 <- function(y) {
   for(i in (1:length(y2))) {
     y2index <- which(y2 > y2[i])
     for(j in y2index) {
-      w <- rep(0,30)
-      w[(i+15)] <- -1
-      w[(j+15)] <- 1
+      w <- rep(0,length(y))
+      w[(i+(length(y)/2))] <- -1
+      w[(j+(length(y)/2))] <- 1
       u <- rbind(u,w)
     }
   }
@@ -123,7 +123,7 @@ ineq2 <- function(y,x1=x1.1,x2=x2.1) {
   
   y1 <- y[1:(length(y)/2)]
   
-  u <- rep(0,30)
+  u <- rep(0,length(y))
   
   for(i in 1:(length(y)/2)) {
     if(x1[i] > min(x1) && x1[i] < max(x1)){
@@ -134,19 +134,19 @@ ineq2 <- function(y,x1=x1.1,x2=x2.1) {
       for(k in y1low){
         for(m in y1high){
           if(x1[i] - x1[m] > x1[k] - x1[i]) {
-            w <- rep(0,15)
+            w <- rep(0,(length(y)/2))
             w[m] <- 1
             w[k] <- 1
             w[i] <- -2
-            w1 <- c(w,rep(0,15))
+            w1 <- c(w,rep(0,(length(y)/2)))
             u <- rbind(u,w1)
           }
           if(x1[i] - x1[m] < x1[k] - x1[i]) {
-            w <- rep(0,15)
+            w <- rep(0,(length(y)/2))
             w[m] <- -1
             w[k] <- -1
             w[i] <- 2
-            w1 <- c(w,rep(0,15))
+            w1 <- c(w,rep(0,(length(y)/2)))
             u <- rbind(u,w1)
           }
         }
@@ -162,7 +162,7 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
   
   y2 <- y[(length(y)/2+1):length(y)]
   
-  u <- rep(0,30)
+  u <- rep(0,length(y))
   
   for(i in 1:(length(y)/2)) {
     if(x2[i] > min(x2) && x2[i] < max(x2)){
@@ -173,19 +173,19 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
       for(k in y2low){
         for(m in y2high){
           if(x2[i] - x2[m] > x2[k] - x2[i]) {
-            w <- rep(0,15)
+            w <- rep(0,(length(y)/2))
             w[m] <- 1
             w[k] <- 1
             w[i] <- -2
-            w1 <- c(rep(0,15),w)
+            w1 <- c(rep(0,(length(y)/2)),w)
             u <- rbind(u,w1)
           }
           if(x2[i] - x2[m] < x2[k] - x2[i]) {
-            w <- rep(0,15)
+            w <- rep(0,(length(y)/2))
             w[m] <- -1
             w[k] <- -1
             w[i] <- 2
-            w1 <- c(rep(0,15),w)
+            w1 <- c(rep(0,(length(y)/2)),w)
             u <- rbind(u,w1)
           }
         }

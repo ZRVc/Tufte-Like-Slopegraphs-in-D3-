@@ -215,7 +215,7 @@ prob <- OP(fo,lc)
 sol <- ROI_solve(prob,solver="alabama",start=start1)
 
 ## The points (formatted for easy pasting into D3)
-points0 <- round(solution(sol)-min(solution(sol)),1)
+points0 <- round(solution(sol)-min(solution(sol)),2)
 
 points1 <- points0[1]
 for(i in 2:(length(points0)/2)) {
@@ -232,7 +232,7 @@ points1
 points2
 
 ## Check the slopes
-y1Solve <- round(solution(sol)-min(solution(sol)),1)[1:(length(solution(sol))/2)]
-y2Solve <- round(solution(sol)-min(solution(sol)),1)[(length(solution(sol))/2+1):length(solution(sol))]
+y1Solve <- round(solution(sol)-min(solution(sol)),2)[1:(length(solution(sol))/2)]
+y2Solve <- round(solution(sol)-min(solution(sol)),2)[(length(solution(sol))/2+1):length(solution(sol))]
 
 (y2Solve-y1Solve)/(x2.1-x1.1)

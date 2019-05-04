@@ -20,6 +20,9 @@ The graph of GDPs (Bembo style) was harder, because I had to figure out a way to
 
 ![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
 
+![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineSidebySide.svg "Side-by-side")
+
+
 ### Tufte's vs Mine Overlay:
 
 ![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png "Overlay")

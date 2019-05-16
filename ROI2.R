@@ -1,5 +1,5 @@
 # Get the data
-tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/42095cdaf56e02762fbb785fea86c9d1b0fadd3d/TufteGovernment.csv")
+tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/Basket.csv")
 
 ## space sets the linespacing.  It is the minimum distance between labels.
 ## drop controls the slope.
@@ -12,7 +12,7 @@ drop <- 24
 ## 3 try to get better spacing for the first column
 ## 4 try to get better spacing for the second column
 ## 5 try to get better spacing for both columns
-optconstr <- 4
+optconstr <- 3
 
 ## set the tolerance for the constraints 
 tol <- 0.0001
@@ -32,19 +32,47 @@ x1.1 <- x[1:(length(x)/2)]
 x2.1 <- x[((length(x)/2)+1):length(x)]
 
 ## This will set the slope so that a one percentage point decrease in GDP share
-## corresponds to a 24 pixel drop on the page.  If there's a tie, it adds 1 to  
+## corresponds to a "drop" pixel drop on the page.  If there's a tie, it adds 1 to  
 ## one of them, so that (for this data at least) the minimum distance between 
 ## two points is 1.  This code will need to be adjusted for other data sets.
 
 y1 <- drop*(max(x) - x1.1)
 y2 <- (y1 - drop*(x2.1-x1.1))
 
+diff1 <- Inf
+dist10 <- 0
+diff2 <- Inf
+dist20 <- 0
+
 for(i in 1:(length(y1)-1)) {
-  if(y1[i] == y1[(i+1)]) {
-    y1[(i+1)] <- y1[(i+1)]+1
-    y2[(i+1)] <- y2[(i+1)]+1
+  for(j in (i+1):(length(y1))) {
+    if(abs(y1[i]-y1[(j)]) < diff1) {
+      if(abs(y1[i]-y1[(j)]) < 0.0001) {
+        dist10 <- 1
+      } else {
+      diff1 <- abs(y1[i]-y1[(j)])
+    }
+  }
   }
 }
+
+for(i in 1:(length(y2)-1)) {
+  for(j in (i+1):(length(y2))) {
+    if(abs(y2[i]-y2[(j)]) < diff2) {
+      if(abs(y2[i]-y2[(j)]) < 0.0001) {
+        dist20 <- 1
+      } else {
+        diff2 <- abs(y2[i]-y2[(j)])
+      }
+    }
+  }
+}
+
+diff <- 0.5*min(c(diff1,diff2))
+
+for(i in 1:(length(y1)-1))
+
+space <- 2*space/diff
 
 z <- c(y1,y2)
 
@@ -74,7 +102,8 @@ fn <- function(y) {
 gr <- function(y) {
   return(gr1(y,z))
 }
-
+x1 <- x1.1
+x2 <- x2.1
 ## First set of constraints: ensure that the slopes are drawn on the same scale.
 ineq0 <- function(y,x1=x1.1,x2=x2.1) {
   
@@ -85,7 +114,7 @@ ineq0 <- function(y,x1=x1.1,x2=x2.1) {
     }
   }
   index1 <- index1[2:length(index1)]
-  index2 <- which(index1!=(1:length(x1)))
+  index2 <- subset((1:length(x1)),!((1:length(x1)) %in% index1))
   
   u <- rep(0,length(y))
   
@@ -156,8 +185,8 @@ ineq2 <- function(y,x1=x1.1,x2=x2.1) {
   
   for(i in 1:(length(y)/2)) {
     if(y1[i] > min(y1) && y1[i] < max(y1)){
-      upper <- min(y1[which(y1 < y1[i])])
-      lower <- max(y1[which(y1 > y1[i])])
+      upper <- min(y1[which(x1 < x1[i])])
+      lower <- max(y1[which(x1 > x1[i])])
       y1low <- which(y1 == lower)
       y1high <- which(y1 == upper)
       for(k in y1low){
@@ -194,7 +223,7 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
   u <- rep(0,length(y))
   
   for(i in 1:(length(y)/2)) {
-    if(x2[i] > min(x2) && x2[i] < max(x2)){
+    if(y2[i] > min(y2) && y2[i] < max(y2)){
       upper <- min(y2[which(x2 < x2[i])])
       lower <- max(y2[which(x2 > x2[i])])
       y2low <- which(y2 == lower)
@@ -252,7 +281,7 @@ constraintmaker <- function(y,tol1=tol,ineq99=ineq,space1=space,optconst=optcons
                               rep(space1,boundsl1))))
   } else if(optconst==3) {
     return(L_constraint(L=ineq, dir=c(rep(">=",boundsl0),rep("<=",boundsl0),
-                                      rep(">=",boundsl1),rep(">=",boundsl3)),
+                                      rep(">=",boundsl1),rep(">=",boundsl2)),
                         rhs=c(rep(-tol,boundsl0),rep(tol,boundsl0),
                               rep(space1,boundsl1),rep(0,boundsl2))))
   } else if(optconst==4) {
@@ -265,7 +294,7 @@ constraintmaker <- function(y,tol1=tol,ineq99=ineq,space1=space,optconst=optcons
                                       rep(">=",boundsl1),rep(">=",boundsl2),
                                       rep(">=",boundsl3)),
                         rhs=c(rep(-tol,boundsl0),rep(tol,boundsl0),
-                              rep(space1,boundsl1),rep(0,boundsl3))))
+                              rep(space1,boundsl1),rep(0,boundsl2),rep(0,boundsl3))))
   }
 }
 ##################################  SOLVING  #########################################

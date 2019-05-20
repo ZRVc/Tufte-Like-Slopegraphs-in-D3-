@@ -12,7 +12,7 @@ drop <- 24
 ## 3 try to get better spacing for the first column
 ## 4 try to get better spacing for the second column
 ## 5 try to get better spacing for both columns
-optconstr <- 4
+optconstr <- 0
 
 ## set the tolerance for the constraints 
 tol <- 0.0001
@@ -32,24 +32,118 @@ x1.1 <- x[1:(length(x)/2)]
 x2.1 <- x[((length(x)/2)+1):length(x)]
 
 ## This will set the slope so that a one percentage point decrease in GDP share
-## corresponds to a "drop" pixel drop on the page.  If there's a tie, it adds 1 to  
-## one of them, so that (for this data at least) the minimum distance between 
-## two points is 1.  This code will need to be adjusted for other data sets.
-
+## corresponds to a "drop" pixel drop on the page.
 y1 <- drop*(max(x) - x1.1)
 y2 <- (y1 - drop*(x2.1-x1.1))
 
 y <- c(y1,y2)
 
+## difference finder
+differ <- function(y) {
+  
+  y1 <- y[1:(length(y)/2)]
+  y2 <- y[(length(y)/2+1):length(y)]
+  
+  diff1 <- Inf
+  dist10 <- 0
+  diff2 <- Inf
+  dist20 <- 0
+  
+  for(i in 1:(length(y1)-1)) {
+    for(j in (i+1):(length(y1))) {
+      if(abs(y1[i]-y1[(j)]) < diff1) {
+        if(abs(y1[i]-y1[(j)]) < 0.0001) {
+          dist10 <- 1
+        } else {
+          diff1 <- abs(y1[i]-y1[(j)])
+        }
+      }
+    }
+  }
+  
+  for(i in 1:(length(y2)-1)) {
+    for(j in (i+1):(length(y2))) {
+      if(abs(y2[i]-y2[(j)]) < diff2) {
+        if(abs(y2[i]-y2[(j)]) < 0.0001) {
+          dist20 <- 1
+        } else {
+          diff2 <- abs(y2[i]-y2[(j)])
+        }
+      }
+    }
+  }
+  
+  diff <- min(c(diff1,diff2))
+  return(diff)
+}
+
+## adjuster function
+adjuster <- function(y,x1=x1.1,x2=x2.1,diff=mindiff) {
+  
+  y1 <- y[1:(length(y)/2)]
+  y2 <- y[(length(y)/2+1):length(y)]
+  
+  index1 <- which(duplicated(x1))
+  index2 <- which(duplicated(x2))
+  
+  y1.1 <- subset(y1,duplicated(x1))
+  y1.2 <- subset(y1,duplicated(x2))
+  y1.1tab <- table(y1.1)
+  crashpts1 <- as.numeric(names(y1.1tab))
+  
+  y2.1 <- subset(y2,duplicated(x1)) 
+  y2.2 <- subset(y2,duplicated(x2)) 
+  y2.2tab <- table(y2.2)
+  crashpts2 <- as.numeric(names(y2.2tab))
+  
+  
+  n <- max(c(unname(y1.1tab),unname(y2.2tab)))
+  
+  
+  adj <- diff/(n+1)
+  
+  if(length(index1)>0) {
+    adj0 <- 0
+    for(i in 1:length(y1.1tab)) {
+      for(j in 1:(unname(y1.1tab)[i])) {
+        adj0 <- c(adj0,j)
+      }
+    }
+    adj0 <- adj0[2:length(adj0)]
+    
+    y1.1 <- y1.1+adj0*adj
+    y2.1 <- y2.1+adj0*adj
+    y1[index1] <- y1.1
+    y2[index1] <- y2.1
+  }
+  
+  
+  if(length(index2)>0) {
+    adj0 <- 0
+    for(i in 1:length(y2.2tab)) {
+      for(j in 1:(unname(y2.2tab)[i])) {
+        adj0 <- c(adj0,j)
+      }
+    }
+    adj0 <- adj0[2:length(adj0)]
+    
+    y2.2 <- y2.2+adj0*adj
+    y1.2 <- y1.2+adj0*adj
+    y1[index2] <- y1.2
+    y2[index2] <- y2.2
+  }
+  return(c(y1,y2))
+}
 
 
-space2 <- space/0.11
+mindiff <- differ(y)
+
+space2 <- 1.1*space/(mindiff)
 
 z <- adjuster(y)
 ## This will be the starting point in our search for an optimum solution.  I multiply 
 ## everything by "space" so that the minimum distance is now the linespacing I'm
 ## after.
-z
 start1 <- c(space2*z[1:(length(z)/2)],space2*z[(length(z)/2+1):length(z)])
 
 ###################################################
@@ -295,101 +389,3 @@ y1Solve <- round(solution(sol)-min(solution(sol)),2)[1:(length(solution(sol))/2)
 y2Solve <- round(solution(sol)-min(solution(sol)),2)[(length(solution(sol))/2+1):length(solution(sol))]
 
 (y2Solve-y1Solve)/(x2.1-x1.1)
-
-
-
-
-
-#########################
-##adjuster function
-adjuster <- function(y,x1=x1.1,x2=x2.1) {
-  
-  diff1 <- Inf
-  dist10 <- 0
-  diff2 <- Inf
-  dist20 <- 0
-  
-  for(i in 1:(length(y1)-1)) {
-    for(j in (i+1):(length(y1))) {
-      if(abs(y1[i]-y1[(j)]) < diff1) {
-        if(abs(y1[i]-y1[(j)]) < 0.0001) {
-          dist10 <- 1
-        } else {
-          diff1 <- abs(y1[i]-y1[(j)])
-        }
-      }
-    }
-  }
-  
-  for(i in 1:(length(y2)-1)) {
-    for(j in (i+1):(length(y2))) {
-      if(abs(y2[i]-y2[(j)]) < diff2) {
-        if(abs(y2[i]-y2[(j)]) < 0.0001) {
-          dist20 <- 1
-        } else {
-          diff2 <- abs(y2[i]-y2[(j)])
-        }
-      }
-    }
-  }
-  
-  diff <- min(c(diff1,diff2))
-  
-  index1 <- which(duplicated(x1))
-  index2 <- which(duplicated(x2))
-  
-  y1.1 <- subset(y1,duplicated(x1))
-  y1.2 <- subset(y1,duplicated(x2))
-  y1.1tab <- table(y1.1)
-  crashpts1 <- as.numeric(names(y1.1tab))
-  
-  y2.1 <- subset(y2,duplicated(x1)) 
-  y2.2 <- subset(y2,duplicated(x2)) 
-  y2.2tab <- table(y2.2)
-  crashpts2 <- as.numeric(names(y2.2tab))
-  
-  
-  n <- max(c(unname(y1.1tab),unname(y2.2tab)))
-  
-  
-  adj <- diff/(n+1)
-  
-  #y1
-  adj0 <- 0
-  for(i in 1:length(y1.1tab)) {
-    for(j in 1:(unname(y1.1tab)[i])) {
-      adj0 <- c(adj0,j)
-    }
-  }
-  adj0 <- adj0[2:length(adj0)]
-  
-  y1.1 <- y1.1+adj0*adj
-  y2.1 <- y2.1+adj0*adj
-  y1[index1] <- y1.1
-  y2[index1] <- y2.1
-  
-  #y2
-  adj0 <- 0
-  for(i in 1:length(y2.2tab)) {
-    for(j in 1:(unname(y2.2tab)[i])) {
-      adj0 <- c(adj0,j)
-    }
-  }
-  adj0 <- adj0[2:length(adj0)]
-  
-  #y2
-  adj0 <- 0
-  for(i in 1:length(y2.2tab)) {
-    for(j in 1:(unname(y2.2tab)[i])) {
-      adj0 <- c(adj0,j)
-    }
-  }
-  adj0 <- adj0[2:length(adj0)]
-  
-  y2.2 <- y2.2+adj0*adj
-  y1.2 <- y1.2+adj0*adj
-  y1[index2] <- y1.2
-  y2[index2] <- y2.2
-  
-  return(c(y1,y2))
-}

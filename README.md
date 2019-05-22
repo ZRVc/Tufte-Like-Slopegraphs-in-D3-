@@ -8,6 +8,8 @@ The stacked slopegraph for survival rates, was pretty easy to do, but the graph 
 
 I was convinced that Tufte's graph had incorrect slopes.  Then, I looked at the printed version and it became clear what had happened.  The version in the book is different from the one on the web.  In the book, it looks like he plotted the lines where they should be and adjusted the labels so that they wouldn't crash.  The result was that the endpoints of the lines didn't line up with the text, though I think the overall result is pretty good for this data set.  For the web version, it looks like he centered the endpoints of the line to the corrected text, with the result being inaccurate slopes.
 
+[The version from the book](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteBookVersion.jpg)
+
 My code is capable of drawing:
 
 [A) A replica of the original book version (using the original points for the line, and using only one constraint to adjust the labels)](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteCorrect.html)

@@ -10,11 +10,11 @@ I was convinced that Tufte's graph had incorrect slopes.  Then, I looked at the 
 
 My code is capable of drawing:
 
-A) A replica of the original book version (using the original points for the line, and using only one constraint to adjust the labels)
+[A) A replica of the original book version (using the original points for the line, and using only one constraint to adjust the labels)](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteCorrect.html)
 
-B) A replica of the version on Tufte's webpage, with the incorrect slopes (using a constraint to adjust the labels and plotting the lines' endpoints at the same positions)
+[B) A replica of the version on Tufte's webpage, with the incorrect slopes (using a constraint to adjust the labels and plotting the lines' endpoints at the same positions)](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteIncorrect.html)
 
-C) A version of B) with correct slopes, which is what the code was originally developed to do
+[C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteNewCorrect.html)
 
 ### GDP rates slopegraphs:
 

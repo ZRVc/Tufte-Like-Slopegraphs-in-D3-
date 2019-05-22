@@ -1,5 +1,5 @@
 # Get the data
-tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/Basket.csv")
+tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/TufteGovernment.csv")
 
 ## space sets the linespacing.  It is the minimum distance between labels.
 ## drop controls the slope.
@@ -7,12 +7,8 @@ tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegrap
 space <- 16
 drop <- 24
 
-## set the optional constraints:  
-## 0 neither
-## 3 try to get better spacing for the first column
-## 4 try to get better spacing for the second column
-## 5 try to get better spacing for both columns
-optconstr <- 0
+## set the constraints:  
+constr <- c(1,2,4)
 
 ## set the tolerance for the constraints 
 tol <- 0.0001
@@ -316,49 +312,59 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
   return(unname(u[2:dim(u)[1],]))
 }
 
-inequalitymaker <- function(y,optconst=optconstr){
-  if(optconst==0){
-    return(rbind(ineq0(y),ineq0(y),ineq1(y)))
-  } else if(optconst==3) {
-    return(rbind(ineq0(y),ineq0(y),ineq1(y),ineq2(y)))
-  } else if(optconst==4) {
-    return(rbind(ineq0(y),ineq0(y),ineq1(y),ineq3(y)))
-  } else {
-    return(rbind(ineq0(y),ineq0(y),ineq1(y),ineq2(y),ineq3(y)))
+inequalitymaker <- function(y,const=constr){
+  
+  iq <- rep(0,length(y))
+  
+  if(1 %in% const){
+    iq <- rbind(iq,ineq0(y),ineq0(y))
+  } 
+  if(2 %in% const) {
+    iq <- rbind(iq,ineq1(y))
+  } 
+  if(3 %in% const) {
+    iq <- rbind(iq,ineq2(y))
+  } 
+  if(4 %in% const) {
+    iq <- rbind(iq,ineq3(y))
   }
+  return(iq[2:length(iq[,1]),])
+  
 }
+
 
 ineq <- inequalitymaker(start1)
 
-constraintmaker <- function(y,tol1=tol,ineq99=ineq,space1=space,optconst=optconstr){
+constraintmaker <- function(y,tol1=tol,ineq99=ineq,space1=space,const=constr){
   
-  boundsl0 <- length(ineq0(start1)[,1])
-  boundsl1 <- length(ineq1(start1)[,1])
-  boundsl2 <- length(ineq2(start1)[,1])
-  boundsl3 <- length(ineq3(start1)[,1])
+  dir1 <- 0
+  rhs1 <- 0
   
-  if(optconst==0) {
-    return(L_constraint(L=ineq, dir=c(rep(">=",boundsl0),rep("<=",boundsl0),
-                                      rep(">=",boundsl1)),
-                        rhs=c(rep(-tol,boundsl0),rep(tol,boundsl0),
-                              rep(space1,boundsl1))))
-  } else if(optconst==3) {
-    return(L_constraint(L=ineq, dir=c(rep(">=",boundsl0),rep("<=",boundsl0),
-                                      rep(">=",boundsl1),rep(">=",boundsl2)),
-                        rhs=c(rep(-tol,boundsl0),rep(tol,boundsl0),
-                              rep(space1,boundsl1),rep(0,boundsl2))))
-  } else if(optconst==4) {
-    return(L_constraint(L=ineq, dir=c(rep(">=",boundsl0),rep("<=",boundsl0),
-                                      rep(">=",boundsl1),rep(">=",boundsl3)),
-                        rhs=c(rep(-tol,boundsl0),rep(tol,boundsl0),
-                              rep(space1,boundsl1),rep(0,boundsl3))))
-  } else {
-    return(L_constraint(L=ineq, dir=c(rep(">=",boundsl0),rep("<=",boundsl0),
-                                      rep(">=",boundsl1),rep(">=",boundsl2),
-                                      rep(">=",boundsl3)),
-                        rhs=c(rep(-tol,boundsl0),rep(tol,boundsl0),
-                              rep(space1,boundsl1),rep(0,boundsl2),rep(0,boundsl3))))
+  boundsl0 <- length(ineq0(y)[,1])
+  boundsl1 <- length(ineq1(y)[,1])
+  boundsl2 <- length(ineq2(y)[,1])
+  boundsl3 <- length(ineq3(y)[,1])
+  
+  if(1 %in% const) {
+    dir1 <- c(dir1,rep(">=",boundsl0),rep("<=",boundsl0))
+    rhs1 <- c(rhs1,rep(-tol,boundsl0),rep(tol,boundsl0))
   }
+  if(2 %in% const) {
+    dir1 <- c(dir1,rep(">=",boundsl1))
+    rhs1 <- c(rhs1,rep(space1,boundsl1))
+  }
+  if(3 %in% const) {
+    dir1 <- c(dir1,rep(">=",boundsl2))
+    rhs1 <- c(rhs1,rep(0,boundsl2))
+  }
+  if(4 %in% const) {
+    dir1 <- c(dir1,rep(">=",boundsl3))
+    rhs1 <- c(rhs1,rep(0,boundsl3))
+  }
+  dir1 <- dir1[2:length(dir1)]
+  rhs1 <- rhs1[2:length(rhs1)]
+  
+  return(L_constraint(L=ineq99, dir=dir1, rhs=rhs1))
 }
 ##################################  SOLVING  #########################################
 fo <-  F_objective(F=fn,n=length(start1),G=gr)

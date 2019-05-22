@@ -18,10 +18,6 @@ My code is capable of drawing:
 
 [C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteNewCorrect.html)
 
-### GDP rates slopegraphs:
-
-[First version](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteBemboStyle.html)
-
 ### Tufte's vs Mine side-by-side:
 
 ![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")

@@ -15,14 +15,14 @@
 \setmathfont[range=it]{ScalaOT-Italic}
 \setmathfont[range=\mathup/{num},Numbers={Tabular,Lining}]{ScalaOT}
 %\setmathfont[range={"0030-"0039}]{ScalaOT}
-\setmathfont[range=\mathup/{greek,Greek}]{Alegreya-Regular_0.otf}
-\setmathfont[range=\mathit/{greek,Greek}]{Alegreya-Regular_0.otf}
+\setmathfont[range=\mathup/{greek,Greek}]{Alegreya-Regular.otf}
+\setmathfont[range=\mathit/{greek,Greek}]{Alegreya-Regular.otf}
 \setmathfont[range={"002C}]{ScalaOT}
 \setmathfont[range="002A]{ScalaOT}
 \setmathfont[range={"222B},Scale=1.15]{LIBERTINUSMATH-REGULAR.otf}
 \setmonofont[Scale=MatchUppercase]{NEXUSTYPEWRITERTF-REGULAR.otf}
 \setsansfont[Numbers=Tabular]{SCALASANSPRO-REGULAR.otf}
-\newfontfamily\myfontA[Numbers={Tabular,OldStyle}]{BEMBOBOOKMTSTD-REGULAR_0.otf}
+\newfontfamily\myfontA[Numbers={Tabular,OldStyle}]{BEMBOBOOKMTSTD-REGULAR.otf}
 \newfontfamily\myfontB[Numbers={Tabular,OldStyle}]{SCALASANSPRO-ITALIC.otf}
 \newfontface\myfontC[]{AlegreyaSans-Regular.otf}
 \definecolor{myblue}{RGB}{11, 79, 160}
@@ -87,11 +87,9 @@ Japan & 20.7 & 26.6 \\  \bottomrule
 \end{myfontA}
 \end{minipage}}
 \adjustbox{valign=t}{\begin{minipage}[]{1\textwidth}
-\vspace{-3.25cm} \includegraphics[]{TufteDrawFull1.eps}
 \end{minipage}}%
 \newpage
 \adjustbox{valign=t}{\begin{minipage}[28.2cm]{0.53\textwidth}
-$\vcenter{\hbox{\includegraphics[]{TufteCrash.eps}}}$
 \end{minipage}}%
 \hfill
 \adjustbox{valign=t}{\begin{minipage}[t]{0.42\textwidth}
@@ -109,19 +107,28 @@ The result is shown to the left.  Obviously, some points are too close together 
 \noindent
 \adjustbox{valign=c}{\begin{minipage}[t]{0.53\textwidth}
 \section{Optimization}
-The function to be optimized is the sum of squared distances between the points and their ideal placements.  The two columns of $n$ rows of data are combined into one vector, \textbf{x}.  Let \textbf{y} be the vector of the points' vertical positions.  Let \textbf{z} be the vector of their ideal positions.  The \textbf{objective function} is:
+We make the following assignments:
+\begin{align*}
+	&\left \{x_{1,j},... ,x_{n,j} \right \} &:=  \quad&\text{The numbers in column } j \text{ for } j=1,2 \\
+	&\left \{y_{1,j},... ,y_{n,j} \right \} &:= \quad&\text{The vertical coordinates of the } x_{ij} \text{ at the beginning of the optimization.}\\
+	&\left \{z_{1,j},... ,z_{n,j} \right \} &:= \quad&\text{The ideal placements of the } x_{ij} \text{ (if there were no concerns about crashed labels)} \\
+	&\left \{\hat{y}_{1,j},... ,\hat{y}_{n,j} \right \} &:= \quad&\text{The fitted placements of the }x_{ij}
+\end{align*}
+
+The function to be optimized is the sum of squared distances between the points and their ideal placements.  The \textbf{objective function} is:
 
 \begin{equation}
-\sum_{i=1}^{2n}(z_i-y_i)^2
+\sum_{j=1}^{2}\sum_{i=1}^{n}(z_{ij}-\hat{y}_{ij})^2
 \end{equation}
 
-The first constraint keeps the drop coefficient within some tolerance for each line.  Let \textbf{x}$\mathbf{_1}$ be the numbers in Column 1 and \textbf{y}$\mathbf{_1}$ the vector of their vertical positions.  Let \textbf{x}$\mathbf{_2}$ and \textbf{y}$\mathbf{_2}$ be the corresponding vectors for Column 2.  \textbf{Constraint 1:}
+The first constraint keeps the drop coefficients the same, within some tolerance.  Let  {\myfontC є} be some small number $>0$.  Let $k$ \text{ be the index of the set } $\left \{i \mid x_{i,1}-x_{i,2} \neq 0 \right \}$.  \textbf{Constraint 1:}
 
-\begin{equation}
--\text{\myfontC є} \leq \frac{y_{1,i}-y_{2,i}}{x_{1,i}-x_{2,i}}\ - \frac{y_{1,i+1}-y_{2,i+1}}{x_{1,i+1}-x_{2,i+1}}\ \leq \text{\myfontC є}
-\end{equation}
+\begin{align*}
+-\text{\myfontC є} \leq \frac{\hat{y}_{k,1}-\hat{y}_{k,2}}{x_{k,1}-x_{k,2}}\ - \frac{\hat{y}_{k+1,1}-\hat{y}_{k+1,2}}{x_{k+1,1}-x_{k+1,2}}\ &\leq \text{\myfontC є} \quad &\text{for } 1 < k < \lvert k \rvert \\
+\hat{y}_{i,1}-\hat{y}_{i,2} &=0 \quad &\text{for } i \text{ such that } x_{i,1}-x_{i,2} = 0
+\end{align*}
 
-\textbf{Constraint 2} will make sure that the points stay in order, and that the minimum distance between them is $\zeta$ pixels, where $\zeta$ is chosen to provide the appropriate line spacing (I'm using $\zeta=16$ for an $11.5$ pt. font).  \textbf{y}$\mathbf{_1^*}$ and \textbf{y}$\mathbf{_2^*}$ will beginning\footnotemark.  With \textbf{x}$\mathbf{_1}$, \textbf{x}$\mathbf{_2}$, \textbf{y}$\mathbf{_1}$, and \textbf{y}$\mathbf{_2}$ as before:
+\textbf{Constraint 2} will make sure that the points stay in order, and that the minimum distance between them is $\zeta$ pixels, where $\zeta$ is chosen to provide the appropriate line spacing (I'm using $\zeta=16$ for an $11.5$ pt. font).
 
 \begin{gather}
 y_{1,j} - y_{1,i} \geq \zeta \quad \text{ for all }i,j \text{ s.t. }y_{1,j}^\ast > y_{1,i}^* \\
@@ -144,7 +151,6 @@ Other constraints could be added, but they'd reduce the number of potential solu
 On my graph, it would be impossible to get Finland[38.2] as close to Britain[39.0] as Tufte has it.  Preserving the slope requires us to move both points the same distance, in the same direction, whenever we want to make an adjustment.  Moving Finland[38.2] up… 
 Some lines are identical or nearly so, others are way off.  I know that my slopes are correct because there’s a check at the end of my code.
 \end{minipage}}
-\footnotetext{\textsf{We need to use }\textbf{y}$\mathbf{_1^*}$\textsf{ and }\textbf{y}$\mathbf{_2^*}$\textsf{ for the condition rather than }\textbf{x}$\mathbf{_1}$\textsf{ and }\textbf{x}$\mathbf{_2}$\textsf{, because the starting points are all unique.}}
 \newpage
 \begin{minipage}[]{0.42\textwidth}
 \section{Comparison}
@@ -152,9 +158,6 @@ Some lines are identical or nearly so, others are way off.  I know that my slope
 \end{minipage}%
 \hfill
 \vspace{1.5em}
-\centering \includegraphics[]{TuftesVsMineSBS.eps}
 \newpage
-\raggedright \includegraphics[]{TuftesVsMineOverlay60.png}
 \newpage
-\lstinputlisting[language=R,deletekeywords={diff, drop,start,dir},otherkeywords={ROI_solve,L_constraint,OP,F_objective,solution,inequalitymaker,constraintmaker,ineq0,ineq1,ineq2,ineq3,fn,gr,fn1,gr1,adjuster,differ}]{TufteCode.R}
 \end{document}

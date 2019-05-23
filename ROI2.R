@@ -244,8 +244,8 @@ ineq2 <- function(y,x1=x1.1,x2=x2.1) {
   
   for(i in 1:(length(y)/2)) {
     if(y1[i] > min(y1) && y1[i] < max(y1)){
-      upper <- min(y1[which(x1 < x1[i])])
-      lower <- max(y1[which(x1 > x1[i])])
+      upper <- min(y1[subset(which(x1 <= x1[i]), which(x1 <= x1[i])!=i)])
+      lower <- max(y1[subset(which(x1 >= x1[i]), which(x1 >= x1[i])!=i)])
       y1low <- which(y1 == lower)
       y1high <- which(y1 == upper)
       for(k in y1low){
@@ -283,8 +283,8 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
   
   for(i in 1:(length(y)/2)) {
     if(y2[i] > min(y2) && y2[i] < max(y2)){
-      upper <- min(y2[which(x2 < x2[i])])
-      lower <- max(y2[which(x2 > x2[i])])
+      upper <- min(y2[subset(which(x2 <= x2[i]), which(x2 <= x2[i])!=i)])
+      lower <- max(y2[subset(which(x2 >= x2[i]), which(x2 >= x2[i])!=i)])
       y2low <- which(y2 == lower)
       y2high <- which(y2 == upper)
       for(k in y2low){

@@ -1,16 +1,16 @@
 # Get the data
 tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/TufteGovernment.csv")
 
-## space sets the linespacing.  It is the minimum distance between labels.
-## drop controls the slope.
+## "space" sets the linespacing.  It is the minimum distance between labels.
+## "drop" controls the slope.
 
 space <- 16
 drop <- 24
 
-## set the constraints:  
+## Set the constraints:  
 constr <- c(1,2,4)
 
-## set the tolerance for the constraints 
+## Set the tolerance for Constraint 1: 
 tol <- 0.0001
 
 ## The package "ROI" needs to be installed.
@@ -27,14 +27,14 @@ x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
 x1.1 <- x[1:(length(x)/2)]
 x2.1 <- x[((length(x)/2)+1):length(x)]
 
-## This will set the slope so that a one percentage point decrease in GDP share
+## This will set the slope so that a one unit decrease in x
 ## corresponds to a "drop" pixel drop on the page.
 y1 <- drop*(max(x) - x1.1)
 y2 <- (y1 - drop*(x2.1-x1.1))
 
 y <- c(y1,y2)
 
-## difference finder
+## Difference finder
 differ <- function(y) {
   
   y1 <- y[1:(length(y)/2)]
@@ -73,7 +73,7 @@ differ <- function(y) {
   return(diff)
 }
 
-## adjuster function
+## Adjuster function
 adjuster <- function(y,x1=x1.1,x2=x2.1,diff=mindiff) {
   
   y1 <- y[1:(length(y)/2)]
@@ -201,7 +201,7 @@ ineq0 <- function(y,x1=x1.1,x2=x2.1) {
 }
 
 ## Second set of constraints: ensure that the numbers are displayed in order with the 
-## correct linespacing.
+## correct line spacing.
 ineq1 <- function(y) {
   
   y1 <- y[1:(length(y)/2)]
@@ -234,8 +234,7 @@ ineq1 <- function(y) {
 ## other numbers.  The in-between number's positioning should be closer to whichever 
 ## of the two numbers is closer.  I.e., if 37.5 is between 39.0 and 35.2, it should
 ## be positioned closer to 39.0, because 39.0 - 37.5 < 37.5 - 35.2.  This constraint 
-## is for the first column.  It isn't used in the solution because I'm trying to 
-## keep the size the same as Tufte's.
+## is for the first column.
 ineq2 <- function(y,x1=x1.1,x2=x2.1) {
   
   y1 <- y[1:(length(y)/2)]
@@ -248,28 +247,25 @@ ineq2 <- function(y,x1=x1.1,x2=x2.1) {
       lower <- max(y1[subset(which(x1 >= x1[i]), which(x1 >= x1[i])!=i)])
       y1low <- which(y1 == lower)
       y1high <- which(y1 == upper)
-      for(k in y1low){
-        for(m in y1high){
-          if(x1[i] - x1[m] > x1[k] - x1[i]) {
+
+          if(x1[i] - x1[y1high] > x1[y1low] - x1[i]) {
             w <- rep(0,(length(y)/2))
-            w[m] <- 1
-            w[k] <- 1
+            w[y1high] <- 1
+            w[y1low] <- 1
             w[i] <- -2
             w1 <- c(w,rep(0,(length(y)/2)))
             u <- rbind(u,w1)
           }
-          if(x1[i] - x1[m] < x1[k] - x1[i]) {
+          if(x1[i] - x1[y1high] < x1[y1low] - x1[i]) {
             w <- rep(0,(length(y)/2))
-            w[m] <- -1
-            w[k] <- -1
+            w[y1high] <- -1
+            w[y1low] <- -1
             w[i] <- 2
             w1 <- c(w,rep(0,(length(y)/2)))
             u <- rbind(u,w1)
           }
         }
       }
-    }
-  }
   return(unname(u[2:dim(u)[1],]))
 }
 
@@ -287,31 +283,29 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
       lower <- max(y2[subset(which(x2 >= x2[i]), which(x2 >= x2[i])!=i)])
       y2low <- which(y2 == lower)
       y2high <- which(y2 == upper)
-      for(k in y2low){
-        for(m in y2high){
-          if(x2[i] - x2[m] > x2[k] - x2[i]) {
+
+          if(x2[i] - x2[y2high] > x2[y2low] - x2[i]) {
             w <- rep(0,(length(y)/2))
-            w[m] <- 1
-            w[k] <- 1
+            w[y2high] <- 1
+            w[y2low] <- 1
             w[i] <- -2
             w1 <- c(rep(0,(length(y)/2)),w)
             u <- rbind(u,w1)
           }
-          if(x2[i] - x2[m] < x2[k] - x2[i]) {
+          if(x2[i] - x2[y2high] < x2[y2low] - x2[i]) {
             w <- rep(0,(length(y)/2))
-            w[m] <- -1
-            w[k] <- -1
+            w[y2high] <- -1
+            w[y2low] <- -1
             w[i] <- 2
             w1 <- c(rep(0,(length(y)/2)),w)
             u <- rbind(u,w1)
           }
-        }
-      }
     }
   }
   return(unname(u[2:dim(u)[1],]))
 }
 
+## This will create the inequalities for the constraint-making function below it: 
 inequalitymaker <- function(y,const=constr){
   
   iq <- rep(0,length(y))
@@ -332,9 +326,9 @@ inequalitymaker <- function(y,const=constr){
   
 }
 
-
 ineq <- inequalitymaker(start1)
 
+## This function will create the set of constraints for ROI to use:
 constraintmaker <- function(y,tol1=tol,ineq99=ineq,space1=space,const=constr){
   
   dir1 <- 0

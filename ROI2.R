@@ -93,10 +93,12 @@ adjuster <- function(y,x1=x1.1,x2=x2.1,diff=mindiff) {
   crashpts2 <- as.numeric(names(y2.2tab))
   
   
-  n <- max(c(unname(y1.1tab),unname(y2.2tab)))
+  n1 <- max(unname(y1.1tab))
+  n2 <- max(unname(y2.2tab))
   
   
-  adj <- diff/(n+1)
+  adj1 <- diff/(n1+1)
+  adj2 <- diff/((n1+1)*(n2+1))
   
   if(length(index1)>0) {
     adj0 <- 0
@@ -107,8 +109,8 @@ adjuster <- function(y,x1=x1.1,x2=x2.1,diff=mindiff) {
     }
     adj0 <- adj0[2:length(adj0)]
     
-    y1.1 <- y1.1+adj0*adj
-    y2.1 <- y2.1+adj0*adj
+    y1.1 <- y1.1+adj0*adj1
+    y2.1 <- y2.1+adj0*adj1
     y1[index1] <- y1.1
     y2[index1] <- y2.1
   }
@@ -123,8 +125,8 @@ adjuster <- function(y,x1=x1.1,x2=x2.1,diff=mindiff) {
     }
     adj0 <- adj0[2:length(adj0)]
     
-    y2.2 <- y2.2+adj0*adj
-    y1.2 <- y1.2+adj0*adj
+    y2.2 <- y2.2+adj0*adj2
+    y1.2 <- y1.2+adj0*adj2
     y1[index2] <- y1.2
     y2[index2] <- y2.2
   }
@@ -133,12 +135,14 @@ adjuster <- function(y,x1=x1.1,x2=x2.1,diff=mindiff) {
 
 
 mindiff <- differ(y)
-
-space2 <- 1.1*space/(mindiff)
-
 z <- adjuster(y)
+mindiff2 <- differ(z)
+
+space2 <- 1.1*space/(mindiff2)
+
+
 ## This will be the starting point in our search for an optimum solution.  I multiply 
-## everything by "space" so that the minimum distance is now the linespacing I'm
+## everything by "space" so that the minimum distance is now the line spacing I'm
 ## after.
 start1 <- c(space2*z[1:(length(z)/2)],space2*z[(length(z)/2+1):length(z)])
 
@@ -247,25 +251,25 @@ ineq2 <- function(y,x1=x1.1,x2=x2.1) {
       lower <- max(y1[subset(which(x1 >= x1[i]), which(x1 >= x1[i])!=i)])
       y1low <- which(y1 == lower)
       y1high <- which(y1 == upper)
-
-          if(x1[i] - x1[y1high] > x1[y1low] - x1[i]) {
-            w <- rep(0,(length(y)/2))
-            w[y1high] <- 1
-            w[y1low] <- 1
-            w[i] <- -2
-            w1 <- c(w,rep(0,(length(y)/2)))
-            u <- rbind(u,w1)
-          }
-          if(x1[i] - x1[y1high] < x1[y1low] - x1[i]) {
-            w <- rep(0,(length(y)/2))
-            w[y1high] <- -1
-            w[y1low] <- -1
-            w[i] <- 2
-            w1 <- c(w,rep(0,(length(y)/2)))
-            u <- rbind(u,w1)
-          }
-        }
+      
+      if(x1[i] - x1[y1high] > x1[y1low] - x1[i]) {
+        w <- rep(0,(length(y)/2))
+        w[y1high] <- 1
+        w[y1low] <- 1
+        w[i] <- -2
+        w1 <- c(w,rep(0,(length(y)/2)))
+        u <- rbind(u,w1)
       }
+      if(x1[i] - x1[y1high] < x1[y1low] - x1[i]) {
+        w <- rep(0,(length(y)/2))
+        w[y1high] <- -1
+        w[y1low] <- -1
+        w[i] <- 2
+        w1 <- c(w,rep(0,(length(y)/2)))
+        u <- rbind(u,w1)
+      }
+    }
+  }
   return(unname(u[2:dim(u)[1],]))
 }
 
@@ -283,23 +287,23 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
       lower <- max(y2[subset(which(x2 >= x2[i]), which(x2 >= x2[i])!=i)])
       y2low <- which(y2 == lower)
       y2high <- which(y2 == upper)
-
-          if(x2[i] - x2[y2high] > x2[y2low] - x2[i]) {
-            w <- rep(0,(length(y)/2))
-            w[y2high] <- 1
-            w[y2low] <- 1
-            w[i] <- -2
-            w1 <- c(rep(0,(length(y)/2)),w)
-            u <- rbind(u,w1)
-          }
-          if(x2[i] - x2[y2high] < x2[y2low] - x2[i]) {
-            w <- rep(0,(length(y)/2))
-            w[y2high] <- -1
-            w[y2low] <- -1
-            w[i] <- 2
-            w1 <- c(rep(0,(length(y)/2)),w)
-            u <- rbind(u,w1)
-          }
+      
+      if(x2[i] - x2[y2high] > x2[y2low] - x2[i]) {
+        w <- rep(0,(length(y)/2))
+        w[y2high] <- 1
+        w[y2low] <- 1
+        w[i] <- -2
+        w1 <- c(rep(0,(length(y)/2)),w)
+        u <- rbind(u,w1)
+      }
+      if(x2[i] - x2[y2high] < x2[y2low] - x2[i]) {
+        w <- rep(0,(length(y)/2))
+        w[y2high] <- -1
+        w[y2low] <- -1
+        w[i] <- 2
+        w1 <- c(rep(0,(length(y)/2)),w)
+        u <- rbind(u,w1)
+      }
     }
   }
   return(unname(u[2:dim(u)[1],]))

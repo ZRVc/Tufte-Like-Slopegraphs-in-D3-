@@ -23,13 +23,11 @@ library(ROI)
 library(ROI.plugin.alabama)
 library("alabama")
 
-x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
+x <- as.numeric(c(unlist(tufte2[5:9,2]),(unlist(tufte2[5:9,3]))))
 
 x1.1 <- x[1:(length(x)/2)]
 x2.1 <- x[((length(x)/2)+1):length(x)]
 
-x1.1 <- x1.1
-x2.1 <- x2.1
 
 ## This will set the slope so that a one unit decrease in x
 ## corresponds to a "drop" pixel drop on the page.
@@ -52,16 +50,15 @@ gr <- function(v,z=z){
 }
 
 fn2 <- function(v){
-  w <- c(rep(532.8,15),rep(340.8,15))
-  return(sum(v^2-2*v*w+w^2))
+  return((v[1]-v[2])^2+(v[2]-v[3])^2+(v[3]-v[4])^2+(v[4]-v[5])^2+(v[6]-v[7])^2+(v[7]-v[8])^2+(v[8]-v[9])^2+(v[9]-v[10])^2)
 }
 
 
 
 gr2 <- function(v){
-  w <- c(rep(532.8,15),rep(340.8,15))
-  return(2*v-2*w)
-}
+  return(c((2*v[1]-2*v[2]),(4*v[2]-2*v[1]-2*v[3]),(4*v[3]-2*v[2]-2*v[4]),(4*v[4]-2*v[3]-2*v[5]),(2*v[5]-2*v[4]),
+           (2*v[6]-2*v[7]),(4*v[7]-2*v[6]-2*v[8]),(4*v[8]-2*v[7]-2*v[9]),(4*v[9]-2*v[8]-2*v[10]),(2*v[10]-2*v[9])))
+           }
 ## Wrapper functions to work with ROI
 fn1 <- function(y) {
   return(fn(y,z))
@@ -81,18 +78,20 @@ gr3 <- function(y) {
 }
 
 ## First set of constraints: ensure that the slopes are drawn on the same scale.
-ineq0 <- function(y,x1=x1.1,x2=x2.1) {
+ineq0 <- function(y,x1=x1.1,x2=x2.1,tol1=tol) {
   
   index1 <- 0
   for(i in 1:length(x1)){
     if(x1[i]!=x2[i]){
-      index1 <- c(index1, i)
+      index1 <- c(index1,i)
     }
   }
   index1 <- index1[2:length(index1)]
   index2 <- subset((1:length(x1)),!((1:length(x1)) %in% index1))
   
   u <- rep(0,length(y))
+  v1 <- 0
+  v2 <- 0
   
   for(i in 1:(length(index1)-1)) {
     w1 <- rep(0,length(y))
@@ -102,6 +101,8 @@ ineq0 <- function(y,x1=x1.1,x2=x2.1) {
     w1[(index1[i]+(length(y)/2+1))] <- 1/(x1[index1[(i+1)]]-x2[index1[(i+1)]])
     
     u <- rbind(u,w1)
+    v1 <- append(v1,3,after=length(v1))
+    v2 <- append(v2,tol,after=length(v2)) 
   }
   
   if(length(index2) > 0){
@@ -111,10 +112,16 @@ ineq0 <- function(y,x1=x1.1,x2=x2.1) {
       w2[(index2[i]+(length(y)/2))] <- -1
       
       u <- rbind(u,w2)
+      v1 <- append(v1,3,after=length(v1))
+      v2 <- append(v2,tol,after=length(v2)) 
     }
   }    
   
-  return(unname(u[2:dim(u)[1],]))
+  umod <- u[2:dim(u)[1],]
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  return(unname(cbind(umod,v1mod,v2mod)))
 }
 
 ## Second set of constraints: ensure that the numbers are displayed in order with the 
@@ -125,6 +132,8 @@ ineq1 <- function(y) {
   y2 <- y[(length(y)/2+1):length(y)]
   
   u <- rep(0,length(y))
+  v1 <- 0
+  v2 <- 0
   
   for(i in 1:(length(y1)-1)) {
     for(j in (i+1):(length(y1))) {
@@ -132,6 +141,8 @@ ineq1 <- function(y) {
       w[i] <- -1
       w[j] <- 1
       u <- rbind(u,w)
+      v1 <- append(v1,2,after=length(v1))
+      v2 <- append(v2,0,after=length(v2))
     }
   }
   
@@ -142,9 +153,15 @@ ineq1 <- function(y) {
       w[(i+(length(y)/2))] <- -1
       w[(j+(length(y)/2))] <- 1
       u <- rbind(u,w)
+      v1 <- append(v1,2,after=length(v1))
+      v2 <- append(v2,0,after=length(v2))
     }
   }
-  return(unname(u[2:dim(u)[1],]))
+  umod <- u[2:dim(u)[1],]
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  return(unname(cbind(umod,v1mod,v2mod)))
 }
 
 ## Third set of constraints:  Except for the endpoints, every number is between two
@@ -185,7 +202,9 @@ ineq2 <- function(y,x1=x1.1,x2=x2.1) {
   }
   return(unname(u[2:dim(u)[1],]))
 }
-
+x2[1] <- 44
+x2[5] <- 44
+x2 <- x2.1
 ## Fourth set of constraints:  This is the same as the third constraint, but it's for
 ## the second column.
 ineq3 <- function(y,x1=x1.1,x2=x2.1) {
@@ -193,21 +212,24 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
   y2 <- y[(length(y)/2+1):length(y)]
   
   u <- rep(0,length(y))
+  v1 <- 0
+  v2 <- 0 
   
   for(i in 1:(length(y)/2)) {
-    if(y2[i] > min(y2) && y2[i] < max(y2)){
-      upper <- min(y2[subset(which(x2 <= x2[i]), which(x2 <= x2[i])!=i)])
-      lower <- max(y2[subset(which(x2 >= x2[i]), which(x2 >= x2[i])!=i)])
-      y2low <- which(y2 == lower)
-      y2high <- which(y2 == upper)
+      lowerpts <- subset(which(x2 <= x2[i]), which(x2 <= x2[i])!=i)
+      higherpts <- subset(which(x2 >= x2[i]), which(x2 >= x2[i])!=i)
+      lowernabr <- min(which(x2 == max(x2[lowerpts])))
+      highernabr <- max(which(x2 == min(x2[higherpts])))
       
-      if(x2[i] - x2[y2high] > x2[y2low] - x2[i]) {
+      if(x2[i] - x2[lowernabr] > x2[highernabr] - x2[i]) {
         w <- rep(0,(length(y)/2))
-        w[y2high] <- 1
-        w[y2low] <- 1
+        w[lowernabr] <- 1
+        w[highernabr] <- 1
         w[i] <- -2
         w1 <- c(rep(0,(length(y)/2)),w)
         u <- rbind(u,w1)
+        v1 <- append(v1,2,after=length(v1))
+        v2 <- append(v2,0,after=length(v2)) 
       }
       if(x2[i] - x2[y2high] < x2[y2low] - x2[i]) {
         w <- rep(0,(length(y)/2))
@@ -218,10 +240,7 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1) {
         u <- rbind(u,w1)
       }
     }
-  }
-  return(unname(u[2:dim(u)[1],]))
-}
-
+} 
 ## Constraints for first wave of optimization:
 ineq4 <- function(y) {
   
@@ -229,19 +248,29 @@ ineq4 <- function(y) {
   y2 <- y[(length(y)/2+1):length(y)]
   
   u <- rep(0,length(y))
+  v1 <- 0
+  v2 <- 0
   
   for(i in 1:length(y1)) {
     w <- rep(0, length(y))
     w[i] <- 1
     u <- rbind(u,w)
+    v1 <- append(v1,3,after=length(v1))
+    v2 <- append(v2,tol,after=length(v2)) 
   }
   
   for(i in (1:length(y2))) {
     w <- rep(0, length(y))
     w[(i+(length(y)/2))] <- 1
     u <- rbind(u,w)
+    v1 <- append(v1,3,after=length(v1))
+    v2 <- append(v2,tol,after=length(v2)) 
   }
-  return(unname(u[2:dim(u)[1],]))
+  umod <- u[2:dim(u)[1],]
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+
+  return(unname(cbind(umod,v1mod,v2mod)))
 }
 
 inequalitymaker1 <- function(y){
@@ -250,23 +279,17 @@ inequalitymaker1 <- function(y){
   
   iq <- rbind(iq,ineq0(y),ineq0(y))
   iq <- rbind(iq,ineq4(y),ineq4(y))
-  iq <- rbind(iq,ineq2(y))
-  iq <- rbind(iq,ineq3(y))
+  #iq <- rbind(iq,ineq2(y))
+  #iq <- rbind(iq,ineq3(y))
   return(iq[2:length(iq[,1]),])
   
 }
-
+ 
 ineqbegin <- inequalitymaker1(y)
 
 yboundu <- y+0.1
-yboundu[7] <- yboundu[7]-0.1+0.0001
-yboundu[22] <- yboundu[22]-0.1+0.0001
 yboundl <- y-0.1
-yboundl[7] <- yboundl[7]+0.1-0.0001
-yboundl[22] <- yboundl[22]+0.1-0.0001
-yboundl[8] <- yboundl[7]+0.1
-yboundu
-yboundl
+
 
 constraintmaker1 <- function(y,tol1=tol,ineq99=ineqbegin,yboundu1=yboundu,yboundl1=yboundl){
   
@@ -275,8 +298,8 @@ constraintmaker1 <- function(y,tol1=tol,ineq99=ineqbegin,yboundu1=yboundu,ybound
   
   boundsl0 <- length(ineq0(y)[,1])
   boundsl1 <- length(ineq4(y)[,1])
-  boundsl2 <- length(ineq2(y)[,1])
-  boundsl3 <- length(ineq3(y)[,1])
+  #boundsl2 <- length(ineq2(y)[,1])
+  #boundsl3 <- length(ineq3(y)[,1])
   
   dir1 <- c(dir1,rep(">=",boundsl0),rep("<=",boundsl0))
   rhs1 <- c(rhs1,rep(-tol,boundsl0),rep(tol,boundsl0))
@@ -284,11 +307,11 @@ constraintmaker1 <- function(y,tol1=tol,ineq99=ineqbegin,yboundu1=yboundu,ybound
   dir1 <- c(dir1,rep(">=",boundsl1),rep("<=",boundsl1))
   rhs1 <- c(rhs1,yboundl1,yboundu1)
   
-  dir1 <- c(dir1,rep(">=",boundsl2))
-  rhs1 <- c(rhs1,rep(0,boundsl2))
+  #dir1 <- c(dir1,rep(">=",boundsl2))
+  #rhs1 <- c(rhs1,rep(0,boundsl2))
   
-  dir1 <- c(dir1,rep(">=",boundsl3))
-  rhs1 <- c(rhs1,rep(0,boundsl3))
+  #dir1 <- c(dir1,rep(">=",boundsl3))
+  #rhs1 <- c(rhs1,rep(0,boundsl3))
   
   dir1 <- dir1[2:length(dir1)]
   rhs1 <- rhs1[2:length(rhs1)]
@@ -297,7 +320,7 @@ constraintmaker1 <- function(y,tol1=tol,ineq99=ineqbegin,yboundu1=yboundu,ybound
 }
 ineq1(points0)%*%points0
 ##################################  SOLVING1  #########################################
-fo1 <-  F_objective(F=fn2,n=30,G=gr2)
+fo1 <-  F_objective(F=fn3,n=10,G=gr3)
 
 lc1 <- constraintmaker1(y)
 
@@ -305,8 +328,7 @@ prob1 <- OP(fo1,lc1)
 sol1 <- ROI_solve(prob1,solver="alabama",start=y)
 
 points0 <- solution(sol1)
-
-
+points0[4]-points0[3]
 #############################SHRINKING IT BACK
 inequalitymaker2 <- function(y){
   
@@ -362,4 +384,7 @@ sol2 <- ROI_solve(prob2,solver="alabama",start=points0)
 points1 <- solution(sol2)
 
 
+####################################################
 
+9/8
+3/16

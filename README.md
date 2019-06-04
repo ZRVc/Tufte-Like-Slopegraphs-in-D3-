@@ -18,11 +18,11 @@ My code is capable of drawing:
 
 [C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteNewCorrect.html)
 
-### Tufte's Web Version vs Mine Side-by-Side:
+### Tufte's Web Version vs My Version C Side-by-Side:
 
 ![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
 
-### Tufte's Web Version vs Mine Overlay:
+### Tufte's Web Version vs My Version C Overlay:
 
 ![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png "Overlay")
 

@@ -466,229 +466,161 @@ x2
 tiedpoints1 <- which(x1 %in% x1[duplicated(x1)])
 tiedpoints2 <- which(x2 %in% x2[duplicated(x2)])
 
-
-ineq3 <- function(y,x1=x1.1,x2=x2.1, tol=tol2) {
+ineq3 <- function(y,x1=x1.1,x2=x2.1, tol=tol0, colmn=colmn0, etol=etol0) {
   
-  y2 <- y[(length(y)/2+1):length(y)]
+  if(colmn == 1){
+    y3 <- y[1:(length(y)/2)]
+    x3 <- x1
+    tiedpoints3 <- tiedpoints1
+  }
+  if(colmn == 2){
+    y3 <- y[(length(y)/2+1):length(y)]
+    x3 <- x2
+    tiedpoints3 <- tiedpoints2
+  }
   
-  index <- which(x2 %in% subset(x2, min(x2) < x2 & max(x2) > x2))
+  index <- which(x3 %in% subset(x3, min(x3) < x3 & max(x3) > x3))
   
-  u <- rep(0,length(y))
+  u <- rep(0,length(y)/2)
+  w <- rep(0,(length(y)/2))
   v1 <- 0
   v2 <- 0 
   
   for(m in index) {
-    lowerpts <- which(x2 < x2[m])
-    higherpts <- which(x2 > x2[m])
-    lowernabrs <- which(x2 == max(x2[lowerpts]))
-    highernabrs <- which(x2 == min(x2[higherpts]))
-    
-    if(m %in% tiedpoints2) {
-
-      for(l in lowernabrs) {
-        for(h in highernabrs) {
-          if(l %in% tiedpoints2) {
-            if(h %!in% tiedpoints2) {
-              if(x[h] - x[m] == x[m] - x[l]) {
-                w <- rep(0,(length(y)/2))
-                w[l] <- 0
-                w[h] <- 1
-                w[m] <- 0
-                u <- rbind(u,w,w)
-                v1 <- append(v1,c(1,2),after=length(v1))
-                v2 <- append(v2,c(2*y2[m]-y2[l]+tol-etol,2*y2[m]-y2[l]+tol+etol),after=length(v2)) 
-              } else if(x[h] - x[m] < x[m] - x[l]) {
-                w <- rep(0,(length(y)/2))
-                w[l] <- 0
-                w[h] <- 1
-                w[m] <- 0
-                u <- rbind(u,w)
-                v1 <- append(v1,1,after=length(v1))
-                v2 <- append(v2,2*y2[m]-y2[l]+tol,after=length(v2))
-              } else {
-                w <- rep(0,(length(y)/2))
-                w[l] <- 0
-                w[h] <- 1
-                w[m] <- 0
-                u <- rbind(u,w)
-                v1 <- append(v1,2,after=length(v1))
-                v2 <- append(v2,2*y2[m]-y2[l]+tol,after=length(v2))
-              }
-            }} else if(h %in% tiedpoints2) {
-              if(l %!in% tiedpoints2) {
-            if(x2[h] - x2[m] == x2[m] - x2[l]) {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 1
-              w[h] <- 0
-              w[m] <- 0
-              u <- rbind(u,w,w)
-              v1 <- append(v1,c(1,2),after=length(v1))
-              v2 <- append(v2,c(2*y2[m]-y2[h]-tol-etol,2*y2[m]-y2[h]-tol+etol),after=length(v2))
-            } else if(x[h] - x[m] < x[m] - x[l]) {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 1
-              w[h] <- 0
-              w[m] <- 0
-              u <- rbind(u,w)
-              v1 <- append(v1,1,after=length(v1))
-              v2 <- append(v2,2*y2[m]-y2[h]-tol,after=length(v2))
-            } else {
-              w <- rep(0,(length(y)/2))
-              w[j] <- 1
-              w[h] <- 0
-              w[i] <- 0
-              u <- rbind(u,w)
-              v1 <- append(v1,2,after=length(v1))
-              v2 <- append(v2,2*y2[m]-y2[h]-tol,after=length(v2))
-            }
-          } else if(h !%in% tiedpoints2 && l !%in% tiedpoints2) {
-            if(x[h] - x[m] == x[m] - x[l]) {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 1
-              w[h] <- 1
-              w[m] <- 0
-              u <- rbind(u,w,w)
-              v1 <- append(v1,c(1,2),after=length(v1))
-              v2 <- append(v2,c(2*y2[m]-etol,2*y2[m]+etol),after=length(v2))
-            } else if(x[h] - x[m] < x[m] - x[l]) {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 1
-              w[h] <- 1
-              w[m] <- 0
-              u <- rbind(u,w)
-              v1 <- append(v1,1,after=length(v1))
-              v2 <- append(v2,2*y2[m],after=length(v2))
-            } else {
-              w <- rep(0,(length(y)/2))
-              w[j] <- 1
-              w[h] <- 1
-              w[i] <- 0
-              u <- rbind(u,w)
-              v1 <- append(v1,2,after=length(v1))
-              v2 <- append(v2,2*y2[m],after=length(v2))
-            }
-          }
-        }}
-    } else {}
-    
-    for(l in lowernabrs) {
-      for(h in highernabrs) {
-        if(l %in% tiedpoints2) {
-          if(h %in% tiedpoints2) {
-            if(x[h] - x[m] == x[m] - x[l]) {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 0
-              w[h] <- 0
-              w[m] <- 2
-              u <- rbind(u,w,w)
-              v1 <- append(v1,c(1,2),after=length(v1))
-              v2 <- append(v2,c(y2[h]+y2[l]-etol,y2[h]+y2[l]+etol),after=length(v2)) 
-            } else if(x[h] - x[m] < x[m] - x[l]) {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 0
-              w[h] <- 0
-              w[m] <- 2
-              u <- rbind(u,w)
-              v1 <- append(v1,1,after=length(v1))
-              v2 <- append(v2,y2[h]+y2[l],after=length(v2))
-            } else {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 0
-              w[h] <- 0
-              w[m] <- 2
-              u <- rbind(u,w)
-              v1 <- append(v1,2,after=length(v1))
-              v2 <- append(v2,y2[h]+y2[l],after=length(v2))
-            }
-          } else {
-            if(x[h] - x[m] == x[m] - x[l]) {
-              w <- rep(0,(length(y)/2))
-              w[l] <- 0
-              w[h] <- -1
-              w[m] <- 2
-              u <- rbind(u,w,w)
-              v1 <- append(v1,c(1,2),after=length(v1))
-              v2 <- append(v2,c(y2[l]-tol-etol,y2[l]-tol+etol),after=length(v2)) 
-          } else if(x[h] - x[m] < x[m] - x[l]) {
-            w <- rep(0,(length(y)/2))
-            w[l] <- 0
-            w[h] <- -1
-            w[m] <- 2
-            u <- rbind(u,w)
-            v1 <- append(v1,1,after=length(v1))
-            v2 <- append(v2,y2[l]-tol,after=length(v2)) 
-          } else {
-            w <- rep(0,(length(y)/2))
-            w[l] <- 0
-            w[h] <- -1
-            w[m] <- 2
-            u <- rbind(u,w)
-            v1 <- append(v1,2,after=length(v1))
-            v2 <- append(v2,y2[l]-tol,after=length(v2)) 
-          }
-          }
-        } else if(h %in% tiedpoints2) {
-          if(x[h] - x[m] == x[m] - x[l]) {
-            w <- rep(0,(length(y)/2))
-            w[l] <- -1
-            w[h] <- 0
-            w[m] <- 2
+    lowerpts <- which(x3 < x3[m])
+    higherpts <- which(x3 > x3[m])
+    l <- min(which(x3 == max(x3[lowerpts])))
+    h <- max(which(x3 == min(x3[higherpts])))
+    if(m %in% tiedpoints3) {
+      if(l %in% tiedpoints3 && !(h %in% tiedpoints3)) {
+        w[l] <- 0
+        w[h] <- 1
+        w[m] <- 0
+        if(x3[h] - x3[m] == x3[m] - x3[l]) {
+          u <- rbind(u,w,w)
+          v1 <- append(v1,c(1,2),after=length(v1))
+          v2 <- append(v2,c(2*y3[m]-y3[l]+tol-etol,2*y3[m]-y3[l]+tol+etol),after=length(v2)) 
+        } else if(x3[h] - x3[m] < x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,2*y3[m]-y3[l]+tol,after=length(v2))
+        } else {
+          u <- rbind(u,w)
+          v1 <- append(v1,2,after=length(v1))
+          v2 <- append(v2,2*y3[m]-y3[l]+tol,after=length(v2))
+        }
+      } else if(h %in% tiedpoints3 && !(l %in% tiedpoints3)) {
+        w[l] <- 1
+        w[h] <- 0
+        w[m] <- 0
+        if(x3[h] - x3[m] == x3[m] - x3[l]) {
+          u <- rbind(u,w,w)
+          v1 <- append(v1,c(1,2),after=length(v1))
+          v2 <- append(v2,c(2*y3[m]-y3[h]-tol-etol,2*y3[m]-y3[h]-tol+etol),after=length(v2))
+        } else if(x3[h] - x3[m] < x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,2*y3[m]-y3[h]-tol,after=length(v2))
+        } else {
+          u <- rbind(u,w)
+          v1 <- append(v1,2,after=length(v1))
+          v2 <- append(v2,2*y3[m]-y3[h]-tol,after=length(v2))
+        }
+      } else if(!(h %in% tiedpoints3) && !(l %in% tiedpoints3)) {
+        w[l] <- 1
+        w[h] <- 1
+        w[m] <- 0
+        if(x3[h] - x3[m] == x3[m] - x3[l]) {
+          u <- rbind(u,w,w)
+          v1 <- append(v1,c(1,2),after=length(v1))
+          v2 <- append(v2,c(2*y3[m]-etol,2*y3[m]+etol),after=length(v2))
+        } else if(x3[h] - x3[m] < x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,2*y3[m],after=length(v2))
+        } else {
+          u <- rbind(u,w)
+          v1 <- append(v1,2,after=length(v1))
+          v2 <- append(v2,2*y3[m],after=length(v2))
+        }
+      }
+    } else {
+      if(l %in% tiedpoints3) {
+        if(h %in% tiedpoints3) {
+          w[l] <- 0
+          w[h] <- 0
+          w[m] <- 2
+          if(x3[h] - x3[m] == x3[m] - x3[l]) {
             u <- rbind(u,w,w)
             v1 <- append(v1,c(1,2),after=length(v1))
-            v2 <- append(v2,c(y2[h]+tol-etol,y2[h]+tol+etol),after=length(v2))
-          } else if(x[h] - x[m] < x[m] - x[l]) {
-            w <- rep(0,(length(y)/2))
-            w[l] <- -1
-            w[h] <- 0
-            w[m] <- 2
-            u <- rbind(u,w)
-            v1 <- append(v1,1,after=length(v1))
-            v2 <- append(v2,y2[h]+tol,after=length(v2))
-          } else {
-            w <- rep(0,(length(y)/2))
-            w[j] <- -1
-            w[h] <- 0
-            w[i] <- 2
+            v2 <- append(v2,c(y3[h]+y3[l]-etol,y3[h]+y3[l]+etol),after=length(v2)) 
+          } else if(x3[h] - x3[m] < x3[m] - x3[l]) {
             u <- rbind(u,w)
             v1 <- append(v1,2,after=length(v1))
-            v2 <- append(v2,y2[h]+tol,after=length(v2))
+            v2 <- append(v2,y3[h]+y3[l],after=length(v2))
+          } else {
+            u <- rbind(u,w)
+            v1 <- append(v1,1,after=length(v1))
+            v2 <- append(v2,y3[h]+y3[l],after=length(v2))
           }
         } else {
-          if(x[h] - x[m] == x[m] - x[l]) {
-            w <- rep(0,(length(y)/2))
-            w[l] <- -1
-            w[h] <- -1
-            w[m] <- 2
+          w[l] <- 0
+          w[h] <- -1
+          w[m] <- 2
+          if(x3[h] - x3[m] == x3[m] - x3[l]) {
             u <- rbind(u,w,w)
             v1 <- append(v1,c(1,2),after=length(v1))
-            v2 <- append(v2,c(-etol,etol),after=length(v2))
-          } else if(x[h] - x[m] < x[m] - x[l]) {
-            w <- rep(0,(length(y)/2))
-            w[l] <- -1
-            w[h] <- -1
-            w[m] <- 2
+            v2 <- append(v2,c(y3[l]-tol-etol,y3[l]-tol+etol),after=length(v2)) 
+          } else if(x3[h] - x3[m] < x3[m] - x3[l]) {
             u <- rbind(u,w)
             v1 <- append(v1,2,after=length(v1))
-            v2 <- append(v2,0,after=length(v2)) 
+            v2 <- append(v2,y3[l]-tol,after=length(v2)) 
           } else {
-            w <- rep(0,(length(y)/2))
-            w[j] <- -1
-            w[h] <- -1
-            w[i] <- 2
             u <- rbind(u,w)
             v1 <- append(v1,1,after=length(v1))
-            v2 <- append(v2,0,after=length(v2)) 
+            v2 <- append(v2,y3[l]-tol,after=length(v2)) 
           }
         }
-      }}
-        
-        
-        
-    umod <- u[2:dim(u)[1],]
-    v1mod <- v1[2:length(v1)]
-    v2mod <- v2[2:length(v2)]
-    
-    return(unname(cbind(umod,v1mod,v2mod)))
+      } else if(h %in% tiedpoints3) {
+        w[l] <- -1
+        w[h] <- 0
+        w[m] <- 2
+        if(x3[h] - x3[m] == x3[m] - x3[l]) {
+          u <- rbind(u,w,w)
+          v1 <- append(v1,c(1,2),after=length(v1))
+          v2 <- append(v2,c(y3[h]+tol-etol,y3[h]+tol+etol),after=length(v2))
+        } else if(x3[h] - x3[m] < x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,2,after=length(v1))
+          v2 <- append(v2,y3[h]+tol,after=length(v2))
+        } else {
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,y3[h]+tol,after=length(v2))
+        }
+      } else {
+        w[l] <- -1
+        w[h] <- -1
+        w[m] <- 2
+        if(x3[h] - x3[m] == x3[m] - x3[l]) {
+          u <- rbind(u,w,w)
+          v1 <- append(v1,c(1,2),after=length(v1))
+          v2 <- append(v2,c(-etol,etol),after=length(v2))
+        } else if(x3[h] - x3[m] < x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,2,after=length(v1))
+          v2 <- append(v2,0,after=length(v2)) 
+        } else {
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,0,after=length(v2)) 
+        }
+      }
+    }
   }
-    
-ineq3(y)
+  umod <- u[2:dim(u)[1],]
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  return(unname(cbind(umod,v1mod,v2mod)))
+}

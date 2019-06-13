@@ -13,7 +13,7 @@ constr <- c(1,2,4)
 ## Set the tolerance for the slopes: 
 slopetol <- 0.00001
 spreadtol <- 0.005
-equaltiytol <- 0.001
+equalitytol <- 0.001
 
 ## The package "ROI" needs to be installed.
 # install.packages("ROI")
@@ -25,64 +25,43 @@ library(ROI)
 library(ROI.plugin.alabama)
 library("alabama")
 
-x <- as.numeric(c(unlist(tufte2[5:9,2]),(unlist(tufte2[5:9,3]))))
+x <- as.numeric(c(unlist(tufte2[,2]),(unlist(tufte2[,3]))))
 
-x1.1 <- x[1:(length(x)/2)]
-x2.1 <- x[((length(x)/2)+1):length(x)]
+x <- list(x[1:(length(x)/2)], x[((length(x)/2)+1):length(x)])
 
+## Finding the ties
+tiedpoints1 <- which(x[[1]] %in% x[[1]][duplicated(x[[1]])])
+tiedpoints2 <- which(x[[2]] %in% x[[2]][duplicated(x[[2]])])
+tiedpoints <- list(tiedpoints1, tiedpoints2)
 
 ## This will set the slope so that a one unit decrease in x
 ## corresponds to a "drop" pixel drop on the page.
-y1 <- drop*(max(x) - x1.1)
-y2 <- (y1 - drop*(x2.1-x1.1))
+y1 <- drop*(max(c(x[[1]],x[[2]])) - x[[1]])
+y2 <- (y1 - drop*(x[[2]]-x[[1]]))
 
-y <- c(y1,y2)
-z <- y
-
-
-
-###################################################
-## In this part, the functions used for optimization are being declared.
-
+y_start <- c(y1,y2)
+##################Objective Functions
 ## This is the function I'm trying to optimize.
-fn <- function(v,z=z){
+fn <- function(v,z){
   return(sum((z-v)^2))
 }
-
-gr <- function(v,z=z){
+gr <- function(v,z){
   return(2*v-2*z)
 }
 
-fn2 <- function(v){
-  return((v[1]-v[2])^2+(v[2]-v[3])^2+(v[3]-v[4])^2+(v[4]-v[5])^2+(v[6]-v[7])^2+(v[7]-v[8])^2+(v[8]-v[9])^2+(v[9]-v[10])^2)
-}
-
-
-
-gr2 <- function(v){
-  return(c((2*v[1]-2*v[2]),(4*v[2]-2*v[1]-2*v[3]),(4*v[3]-2*v[2]-2*v[4]),(4*v[4]-2*v[3]-2*v[5]),(2*v[5]-2*v[4]),
-           (2*v[6]-2*v[7]),(4*v[7]-2*v[6]-2*v[8]),(4*v[8]-2*v[7]-2*v[9]),(4*v[9]-2*v[8]-2*v[10]),(2*v[10]-2*v[9])))
-}
 ## Wrapper functions to work with ROI
 fn1 <- function(y) {
-  return(fn(y,z))
+  return(fn(y,z=y_start))
 }
-
 gr1 <- function(y) {
-  return(gr(y,z))
+  return(gr(y,z=y_start))
 }
 
-
-fn3 <- function(y) {
-  return(-1*fn2(y))
-}
-
-gr3 <- function(y) {
-  return(-1*gr2(y))
-}
-ineq0(y)
 ## First set of constraints: ensure that the slopes are drawn on the same scale.
-ineq0 <- function(y,x1=x1.1,x2=x2.1,tol1=tol) {
+ineq0 <- function(y,x0=x,s_tol=slopetol) {
+  
+  x1 <- x0[[1]]
+  x2 <- x0[[2]]
   
   index1 <- 0
   for(i in 1:length(x1)){
@@ -106,7 +85,7 @@ ineq0 <- function(y,x1=x1.1,x2=x2.1,tol1=tol) {
     
     u <- rbind(u,w1,w1)
     v1 <- append(v1,c(1,2),after=length(v1))
-    v2 <- append(v2,c(-tol,tol),after=length(v2)) 
+    v2 <- append(v2,c(-s_tol,s_tol),after=length(v2)) 
   }
   
   if(length(index2) > 0){
@@ -117,7 +96,7 @@ ineq0 <- function(y,x1=x1.1,x2=x2.1,tol1=tol) {
       
       u <- rbind(u,w2,w2)
       v1 <- append(v1,c(1,2),after=length(v1))
-      v2 <- append(v2,c(-tol,tol),after=length(v2)) 
+      v2 <- append(v2,c(-s_tol,s_tol),after=length(v2)) 
     }
   }    
   
@@ -128,365 +107,30 @@ ineq0 <- function(y,x1=x1.1,x2=x2.1,tol1=tol) {
   return(unname(cbind(umod,v1mod,v2mod)))
 }
 
-## Second set of constraints: ensure that the numbers are displayed in order with the 
-## correct line spacing.
-ineq1 <- function(y,space=space1) {
-  
-  y1 <- y[1:(length(y)/2)]
-  y2 <- y[(length(y)/2+1):length(y)]
-  
-  u <- rep(0,length(y))
-  v1 <- 0
-  v2 <- 0
-  
-  for(i in 1:(length(y1)-1)) {
-    for(j in (i+1):(length(y1))) {
-      w <- rep(0,length(y))
-      w[i] <- -1
-      w[j] <- 1
-      u <- rbind(u,w)
-      v1 <- append(v1,2,after=length(v1))
-      v2 <- append(v2,space,after=length(v2))
-    }
-  }
-  
-  for(i in (1:length(y2))) {
-    y2index <- which(y2 > y2[i])
-    for(j in y2index) {
-      w <- rep(0,length(y))
-      w[(i+(length(y)/2))] <- -1
-      w[(j+(length(y)/2))] <- 1
-      u <- rbind(u,w)
-      v1 <- append(v1,2,after=length(v1))
-      v2 <- append(v2,space,after=length(v2))
-    }
-  }
-  umod <- u[2:dim(u)[1],]
-  v1mod <- v1[2:length(v1)]
-  v2mod <- v2[2:length(v2)]
-  
-  return(unname(cbind(umod,v1mod,v2mod)))
-}
 
-## Third set of constraints:  Except for the endpoints, every number is between two
-## other numbers.  The in-between number's positioning should be closer to whichever 
-## of the two numbers is closer.  I.e., if 37.5 is between 39.0 and 35.2, it should
-## be positioned closer to 39.0, because 39.0 - 37.5 < 37.5 - 35.2.  This constraint 
-## is for the first column.
-ineq2 <- function(y,x1=x1.1,x2=x2.1) {
-  
-  y1 <- y[(length(y)/2+1):length(y)]
-  
-  index <- which(x1 %in% subset(x1, min(x1) < x1 & max(x1) > x1))
-  
-  u <- rep(0,length(y))
-  v1 <- 0
-  v2 <- 0 
-  
-  for(i in index) {
-    lowerpts <- which(x1 < x1[i])
-    higherpts <- which(x1 > x1[i])
-    lowernabrs <- which(x1 == max(x1[lowerpts]))
-    highernabrs <- which(x1 == min(x1[higherpts]))
-    
-    for(j in lowernabrs) {
-      for(h in highernabrs) {
-        if(x1[i] - x1[j] > x1[h] - x1[i]) {
-          w <- rep(0,(length(y)/2))
-          w[j] <- 1
-          w[h] <- 1
-          w[i] <- -2
-          w1 <- c(rep(0,(length(y)/2)),w)
-          u <- rbind(u,w1)
-          v1 <- append(v1,2,after=length(v1))
-          v2 <- append(v2,0,after=length(v2)) 
-        }
-        if(x1[i] - x1[j] < x1[h] - x1[i]) {
-          w <- rep(0,(length(y)/2))
-          w[j] <- -1
-          w[h] <- -1
-          w[i] <- 2
-          w1 <- c(rep(0,(length(y)/2)),w)
-          u <- rbind(u,w1)
-          v1 <- append(v1,2,after=length(v1))
-          v2 <- append(v2,0,after=length(v2)) 
-        }
-      }
-    }
-  }
-  umod <- u[2:dim(u)[1],]
-  v1mod <- v1[2:length(v1)]
-  v2mod <- v2[2:length(v2)]
-  
-  return(unname(cbind(umod,v1mod,v2mod)))
-}
 
-## Fourth set of constraints:  This is the same as the third constraint, but it's for
-## the second column.
-ineq3 <- function(y,x1=x1.1,x2=x2.1) {
-  
-  y2 <- y[(length(y)/2+1):length(y)]
-  
-  index <- which(x2 %in% subset(x2, min(x2) < x2 & max(x2) > x2))
-  
-  u <- rep(0,length(y))
-  v1 <- 0
-  v2 <- 0 
-  
-  for(i in index) {
-    lowerpts <- which(x2 < x2[i])
-    higherpts <- which(x2 > x2[i])
-    lowernabrs <- which(x2 == max(x2[lowerpts]))
-    highernabrs <- which(x2 == min(x2[higherpts]))
-    
-    for(j in lowernabrs) {
-      for(h in highernabrs) {
-        if(x2[i] - x2[j] > x2[h] - x2[i]) {
-          w <- rep(0,(length(y)/2))
-          w[j] <- 1
-          w[h] <- 1
-          w[i] <- -2
-          w1 <- c(rep(0,(length(y)/2)),w)
-          u <- rbind(u,w1)
-          v1 <- append(v1,2,after=length(v1))
-          v2 <- append(v2,0,after=length(v2)) 
-        }
-        if(x2[i] - x2[j] < x2[h] - x2[i]) {
-          w <- rep(0,(length(y)/2))
-          w[j] <- -1
-          w[h] <- -1
-          w[i] <- 2
-          w1 <- c(rep(0,(length(y)/2)),w)
-          u <- rbind(u,w1)
-          v1 <- append(v1,2,after=length(v1))
-          v2 <- append(v2,0,after=length(v2)) 
-        }
-      }
-    }
-  }
-  umod <- u[2:dim(u)[1],]
-  v1mod <- v1[2:length(v1)]
-  v2mod <- v2[2:length(v2)]
-  
-  return(unname(cbind(umod,v1mod,v2mod)))
-}
-## Constraints for first wave of optimization:
-ineq4 <- function(y) {
-  
-  y1 <- y[1:(length(y)/2)]
-  y2 <- y[(length(y)/2+1):length(y)]
-  
-  u <- rep(0,length(y))
-  v1 <- 0
-  v2 <- 0
-  
-  for(i in 1:length(y1)) {
-    w <- rep(0, length(y))
-    w[i] <- 1
-    u <- rbind(u,w)
-    v1 <- append(v1,3,after=length(v1))
-    v2 <- append(v2,tol,after=length(v2)) 
-  }
-  
-  for(i in (1:length(y2))) {
-    w <- rep(0, length(y))
-    w[(i+(length(y)/2))] <- 1
-    u <- rbind(u,w)
-    v1 <- append(v1,3,after=length(v1))
-    v2 <- append(v2,tol,after=length(v2)) 
-  }
-  umod <- u[2:dim(u)[1],]
-  v1mod <- v1[2:length(v1)]
-  v2mod <- v2[2:length(v2)]
-  
-  return(unname(cbind(umod,v1mod,v2mod)))
-}
-
-inequalitymaker1 <- function(y){
-  
-  iq <- rep(0,(length(y)+2))
-  
-  iq <- rbind(iq,ineq0(y))
-  iq <- rbind(iq,ineq4(y))
-  iq <- rbind(iq,ineq2(y))
-  iq <- rbind(iq,ineq3(y))
-  iq <- iq[2:length(iq[,1]),]
-  
-  dir1 <- iq[,(length(y)+1)]
-  dir1[which(dir1 == 1)] <- ">="
-  dir1[which(dir1 == 2)] <- "<="
-  
-  rhs1 <- iq[,(length(y)+2)]
-  
-  iq <- iq[,1:length(y)]
-  
-  return(L_constraint(L=iq, dir=dir1, rhs=rhs1))
-  
-}
-
-##################################  SOLVING1  #########################################
-fo1 <-  F_objective(F=fn3,n=10,G=gr3)
-
-lc1 <- inequalitymaker1(y)
-
-prob1 <- OP(fo1,lc1)
-sol1 <- ROI_solve(prob1,solver="alabama",start=y)
-
-points0 <- solution(sol1)
-points0[4]-points0[3]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#############################SHRINKING IT BACK
-inequalitymaker2 <- function(y){
-  
-  iq <- rep(0,length(y))
-  
-  iq <- rbind(iq,ineq0(y),ineq0(y))
-  iq <- rbind(iq,ineq1(y))
-  iq <- rbind(iq,ineq2(y))
-  iq <- rbind(iq,ineq3(y))
-  return(iq[2:length(iq[,1]),])
-  
-}
-
-ineqnext <- inequalitymaker2(points0)
-
-
-
-constraintmaker2 <- function(y,tol1=tol,ineq99=ineqnext){
-  
-  dir1 <- 0
-  rhs1 <- 0
-  
-  boundsl0 <- length(ineq0(y)[,1])
-  boundsl1 <- length(ineq1(y)[,1])
-  boundsl2 <- length(ineq2(y)[,1])
-  boundsl3 <- length(ineq3(y)[,1])
-  
-  dir1 <- c(dir1,rep(">=",boundsl0),rep("<=",boundsl0))
-  rhs1 <- c(rhs1,rep(-tol,boundsl0),rep(tol,boundsl0))
-  
-  dir1 <- c(dir1,rep(">=",boundsl1))
-  rhs1 <- c(rhs1,rep(0.05,boundsl1))
-  
-  dir1 <- c(dir1,rep(">=",boundsl2))
-  rhs1 <- c(rhs1,rep(0,boundsl2))
-  
-  dir1 <- c(dir1,rep(">=",boundsl3))
-  rhs1 <- c(rhs1,rep(0,boundsl3))
-  
-  dir1 <- dir1[2:length(dir1)]
-  rhs1 <- rhs1[2:length(rhs1)]
-  
-  return(L_constraint(L=ineq99, dir=dir1, rhs=rhs1))
-}
-
-
-fo2 <-  F_objective(F=fn1,n=30,G=gr1)
-lc2 <- constraintmaker2(points0)
-
-prob2 <- OP(fo2,lc2)
-sol2 <- ROI_solve(prob2,solver="alabama",start=points0)
-
-points1 <- solution(sol2)
-
-
-####################################################
-x1 <- x1.1
-x2 <- x2.1
-
-y1 <- y[1:(length(y)/2)]
-y2 <- y[(length(y)/2+1):length(y)]
-
-index1 <- which(x1 %in% x1[duplicated(x1)])
-index2 <- which(x2 %in% x2[duplicated(x2)])
-
-#if(length(index1) > 0)
-  
-  
-y1.1 <- y1[index1]
-y2.1 <- y2[index1]
-y1.1tab <- table(y1.1)
-tiedpts1 <- as.numeric(names(y1.1tab))
-
-y1.2 <- y1[index2]
-y2.2 <- y2[index2]
-y2.2tab <- table(y2.2)
-tiedpts2 <- as.numeric(names(y2.2tab))
-
-y1
-
-fn2 <- function(v){
-  return((v[1]-105.6)^2+(v[2]-141.6)^2-(v[3]-v[4])^2+(v[5]-204])^2+(v[6]-0)^2
-         +(v[7]-12)^2+(v[8]-4.8)^2+(v[9]-182.4)^2+(v[10]-124.8)^2)
-}
-
-gr2 <- function(v){
-  return(c((2*v[1]-2*105.6),(2*v[2]-2*141.6),-(2*v[3]-2*v[4]),-(2*v[4]-2*v[3]),(2*v[5]-2*204),
-           (2*v[6]-0),(2*v[7]-2*12),(2*v[8]-2*4.8),(2*v[9]-2*182.4),(2*v[10]-2*124.8)))
-}
-
-x2
-
-
-
-
-
-
-tiedpoints1 <- which(x1 %in% x1[duplicated(x1)])
-tiedpoints2 <- which(x2 %in% x2[duplicated(x2)])
-
-ineq3 <- function(y,x1=x1.1,x2=x2.1, tol=tol0, colmn=colmn0, etol=etol0) {
+###Perspective Constraints
+ineq3 <- function(y,x0=x, tol=spreadtol, colmn, etol,tiedpoints0 = tiedpoints) {
   
   if(colmn == 1){
     y3 <- y[1:(length(y)/2)]
-    x3 <- x1
-    tiedpoints3 <- tiedpoints1
+    x3 <- x0[[1]]
+    tiedpoints3 <- tiedpoints0[[1]]
   }
   if(colmn == 2){
     y3 <- y[(length(y)/2+1):length(y)]
-    x3 <- x2
-    tiedpoints3 <- tiedpoints2
+    x3 <- x0[[2]]
+    tiedpoints3 <- tiedpoints0[[2]]
   }
   
   index <- which(x3 %in% subset(x3, min(x3) < x3 & max(x3) > x3))
   
   u <- rep(0,length(y)/2)
-  w <- rep(0,(length(y)/2))
   v1 <- 0
   v2 <- 0 
   
   for(m in index) {
+    w <- rep(0,(length(y)/2))
     lowerpts <- which(x3 < x3[m])
     higherpts <- which(x3 > x3[m])
     l <- min(which(x3 == max(x3[lowerpts])))
@@ -618,9 +262,258 @@ ineq3 <- function(y,x1=x1.1,x2=x2.1, tol=tol0, colmn=colmn0, etol=etol0) {
       }
     }
   }
-  umod <- u[2:dim(u)[1],]
+  if(colmn == 1){
+    umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
+  }
+  if(colmn == 2){
+    umod <- cbind(matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2),u[2:dim(u)[1],])
+  }
+  
   v1mod <- v1[2:length(v1)]
   v2mod <- v2[2:length(v2)]
   
   return(unname(cbind(umod,v1mod,v2mod)))
 }
+
+##Keep the points in order; keep the tiedpoints within tolerance
+################
+ineq4 <- function(y, x0=x, tol2=spreadtol, colmn, tiedpoints0=tiedpoints) {
+  
+  if(colmn == 1){
+    y3 <- y[1:(length(y)/2)]
+    x3 <- x0[[1]]
+    tiedpoints3 <- tiedpoints0[[1]]
+  }
+  if(colmn == 2){
+    y3 <- y[(length(y)/2+1):length(y)]
+    x3 <- x0[[2]]
+    tiedpoints3 <- tiedpoints0[[2]]
+  }
+  
+  u <- rep(0,length(y3))
+  v1 <- 0
+  v2 <- 0
+  
+  minnum <- length(which(x3==min(x3)))
+  
+  for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
+    w <- rep(0,length(y3))
+    if(i %in% tiedpoints3) {
+      w[i] <- 1
+      u <- rbind(u,w,w)
+      v1 <- append(v1,c(1,2),after=length(v1))
+      v2 <- append(v2,c(y3[i]-tol2,y3[i]+tol2),after=length(v2))
+    } 
+    index2 <- which(x3 == max(x3[which(x3 < x3[i])]))
+    if(length(index2) > 1) {
+      w[i] <- 1
+      u <- rbind(u,w)
+      v1 <- append(v1,2,after=length(v1))
+      v2 <- append(v2,y3[index2[1]]-tol2,after=length(v2))
+    } else {
+      w[i] <- -1
+      w[index2] <- 1
+      u <- rbind(u,w)
+      v1 <- append(v1,1,after=length(v1))
+      v2 <- append(v2,0,after=length(v2))
+    }
+  }
+  if(colmn == 1){
+    umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
+  }
+  if(colmn == 2){
+    umod <- cbind(matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2),u[2:dim(u)[1],])
+  }
+  
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  return(unname(cbind(umod,v1mod,v2mod)))
+}
+
+
+## Making the first set of constraints
+inequalitymaker1 <- function(y) {
+  
+  iq <- rep(0,(length(y)+2))
+  
+  iq <- rbind(iq,ineq0(y))
+  iq <- rbind(iq,ineq3(y,colmn=1))
+  iq <- rbind(iq,ineq3(y,colmn=2))
+  iq <- rbind(iq,ineq4(y,colmn=1))
+  iq <- rbind(iq,ineq4(y,colmn=2))
+  iq <- iq[2:length(iq[,1]),]
+                                                  
+  dir1 <- iq[,(length(y)+1)]
+  dir1[which(dir1 == 1)] <- ">="
+  dir1[which(dir1 == 2)] <- "<="
+                                                  
+  rhs1 <- iq[,(length(y)+2)]
+                                                  
+  iq <- iq[,1:length(y)]
+                                                  
+  return(L_constraint(L=iq, dir=dir1, rhs=rhs1))
+}
+
+
+### First objective function
+beginfn <- function(v,z=y_start) {
+  return(sum((z-v)^2)-((z[7]-v[7])^2)-((z[8]-v[8])^2)-(v[7]-v[8])^2)
+}
+
+## First gradient
+begingr <- function(v,z=y_start) {
+  w1 <- 2*v-2*z
+  w1[7] <- 2*v[8] - 2*v[7]
+  w1[8] <- 2*v[7] - 2*v[8]
+  return(w1)
+}
+
+## Wrappers
+beginfn1 <- function(y) {
+  return(beginfn(y,z=y_start))
+}
+
+begingr1 <- function(y) {
+  return(begingr(y,z=y_start))
+}
+
+## The first problem
+fo1 <-  F_objective(F=beginfn1,n=30,G=begingr1)
+lc1 <- inequalitymaker1(y)
+prob1 <- OP(fo1,lc1)
+
+## The first solution
+sol1 <- ROI_solve(prob1,solver="alabama",start=y)
+newstart <- solution(sol1)
+newstart1 <- newstart*3610
+
+#################################Second Wave
+
+ineq8 <- function(y,x0=x,colmn,tiedpoints0=tiedpoints,space0=space) {
+  
+  if(colmn == 1){
+    y3 <- y[1:(length(y)/2)]
+    x3 <- x0[[1]]
+    tiedpoints3 <- tiedpoints0[[1]]
+  }
+  if(colmn == 2){
+    y3 <- y[(length(y)/2+1):length(y)]
+    x3 <- x0[[2]]
+    tiedpoints3 <- tiedpoints0[[2]]
+  }
+  
+  u <- rep(0,length(y3))
+  v1 <- 0
+  v2 <- 0
+  q <- 0
+  
+  minnum <- length(which(x3==min(x3)))
+  
+  for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
+    w <- rep(0,length(y3))
+    if(i %in% tiedpoints3) {
+      grp <- which(x3 == x3[i])
+      grp <- grp[-which(grp == i)]
+      for(j in grp) {
+        wq <- matrix(0, nrow=length(y3), ncol=length(y3))
+        wq[i,i] <- 2 
+        wq[j,j] <- 2
+        wq[i,j] <- -2
+        wq[j,i] <- -2
+        
+        u <- rbind(u,rep(0,length(y3)))
+        v1 <- append(v1,1,after=length(v1))
+        v2 <- append(v2,space0^2,after=length(v2))
+        
+        if(colmn == 1){
+          wq <- cbind(wq,matrix(0,nrow=length(y3),ncol=length(y3)))
+          wq <- rbind(wq,matrix(0,nrow=length(y3),ncol=length(y)))
+        }
+        
+        if(colmn == 2){
+          wq <- cbind(matrix(0,nrow=length(y3),ncol=length(y3)),wq)
+          wq <- rbind(matrix(0,nrow=length(y3),ncol=length(y)),wq)
+        }
+        q <- c(q,list(wq))
+      }
+    }
+    index2 <- min(which(x3 == max(x3[which(x3 < x3[i])])))
+    w[i] <- -1
+    w[index2] <- 1
+    u <- rbind(u,w)
+    v1 <- append(v1,1,after=length(v1))
+    v2 <- append(v2,space0,after=length(v2))
+    q <- c(q,list(NULL))
+  }
+  if(colmn == 1){
+    umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
+  }
+  if(colmn == 2){
+    umod <- cbind(matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2),u[2:dim(u)[1],])
+  }
+  
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  q <- q[2:length(q)]
+  
+  l <- unname(cbind(umod,v1mod,v2mod))
+  return(list(q,l))
+}
+
+
+inequalitymaker2 <- function(y){
+  
+  iq <- rep(0,(length(y)+2))
+  
+  iq <- rbind(iq,ineq0(y))
+  
+  q <- rep(list(NULL),(length(iq[,1])))
+  
+  iq <- rbind(iq,unname(ineq8(y,colmn=1)[[2]]))
+  iq <- rbind(iq,unname(ineq8(y,colmn=2)[[2]]))
+  
+  q <- c(q,unname(ineq8(y,colmn=1)[[1]]))
+  q <- c(q,unname(ineq8(y,colmn=2)[[1]]))
+  
+  
+  iq <- iq[2:length(iq[,1]),]
+  q <- q[2:length(q)]
+  
+  dir1 <- iq[,(length(y)+1)]
+  dir1[which(dir1 == 1)] <- ">="
+  dir1[which(dir1 == 2)] <- "<="
+  
+  rhs1 <- iq[,(length(y)+2)]
+  
+  iq <- iq[,1:length(y)]
+  iq
+  return(Q_constraint(Q=q, L=iq, dir=dir1, rhs=rhs1))
+  
+}
+
+fo2 <-  F_objective(F=fn1,n=30,G=gr1)
+lc2 <- inequalitymaker2(newstart1)
+prob2 <- OP(fo2,lc2)
+sol2 <- ROI_solve(prob2,solver="alabama",start=newstart1)
+
+points0 <- round(solution(sol2)-min(solution(sol2)),2)
+
+points1 <- points0[1]
+for(i in 2:(length(points0)/2)) {
+  points1 <- paste(points1,points0[i],sep = ", ")
+}
+
+points2 <- points0[(length(points0)/2+1)]
+for(i in (length(points0)/2+2):length(points0)) {
+  points2 <- paste(points2,points0[i],sep = ", ")
+}
+
+points1
+points2
+
+y1Solve <- round(solution(sol2)-min(solution(sol2)),2)[1:(length(solution(sol2))/2)]
+y2Solve <- round(solution(sol2)-min(solution(sol2)),2)[(length(solution(sol2))/2+1):length(solution(sol2))]
+
+(y2Solve-y1Solve)/(x[[2]]-x[[1]])

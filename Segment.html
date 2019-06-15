@@ -1052,3 +1052,12 @@ v2mod <- v2[2:length(v2)]
 
 return(unname(cbind(umod,v1mod,v2mod)))
 }
+
+	 
+	 tieloc <- unique(x[duplicated(x)])
+tiegroup <- 0
+
+for(i in tieloc) {
+  tiegroup <- c(tiegroup,list(which(x == i)))
+}
+tiegroup <- tiegroup[2:length(tiegroup)]

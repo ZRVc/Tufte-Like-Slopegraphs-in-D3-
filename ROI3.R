@@ -343,15 +343,15 @@ inequalitymaker1 <- function(y) {
   iq <- rbind(iq,ineq4(y,colmn=1))
   iq <- rbind(iq,ineq4(y,colmn=2))
   iq <- iq[2:length(iq[,1]),]
-                                                  
+  
   dir1 <- iq[,(length(y)+1)]
   dir1[which(dir1 == 1)] <- ">="
   dir1[which(dir1 == 2)] <- "<="
-                                                  
+  
   rhs1 <- iq[,(length(y)+2)]
-                                                  
+  
   iq <- iq[,1:length(y)]
-                                                  
+  
   return(L_constraint(L=iq, dir=dir1, rhs=rhs1))
 }
 
@@ -380,11 +380,11 @@ begingr1 <- function(y) {
 
 ## The first problem
 fo1 <-  F_objective(F=beginfn1,n=30,G=begingr1)
-lc1 <- inequalitymaker1(y)
+lc1 <- inequalitymaker1(y_start)
 prob1 <- OP(fo1,lc1)
 
 ## The first solution
-sol1 <- ROI_solve(prob1,solver="alabama",start=y)
+sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
 newstart <- solution(sol1)
 newstart1 <- newstart*3610
 
@@ -468,6 +468,7 @@ inequalitymaker2 <- function(y){
   iq <- rep(0,(length(y)+2))
   
   iq <- rbind(iq,ineq0(y))
+  iq <- rbind(iq,ineq9(y,colmn=2))
   
   q <- rep(list(NULL),(length(iq[,1])))
   
@@ -517,3 +518,292 @@ y1Solve <- round(solution(sol2)-min(solution(sol2)),2)[1:(length(solution(sol2))
 y2Solve <- round(solution(sol2)-min(solution(sol2)),2)[(length(solution(sol2))/2+1):length(solution(sol2))]
 
 (y2Solve-y1Solve)/(x[[2]]-x[[1]])
+
+x3 <- c(1, 2, 2, 3, 4, 5, 5, 5, 5, 6, 7, 8, 9, 9, 9, 10)
+2*newstart1[]
+ineq9(newstart1,colmn=1)
+tieloc <- unique(x[duplicated(x)])
+tiegroup <- 0
+for(i in tieloc) {
+  tiegroup <- c(tiegroup,list(which(x == i)))
+}
+tiegroup <- tiegroup[2:length(tiegroup)]
+
+
+
+
+
+
+
+
+
+ineq9 <- function(y,x0=x, colmn, tiedpoints0 = tiedpoints) {
+  
+  if(colmn == 1){
+    y3 <- y[1:(length(y)/2)]
+    x3 <- x0[[1]]
+    tiedpoints3 <- tiedpoints0[[1]]
+  }
+  if(colmn == 2){
+    y3 <- y[(length(y)/2+1):length(y)]
+    x3 <- x0[[2]]
+    tiedpoints3 <- tiedpoints0[[2]]
+  }
+  
+  index <- which(x3 %in% subset(x3, min(x3) < x3 & max(x3) > x3 & !(x3 %in% x3[tiedpoints3])))
+  
+  u <- rep(0,length(y)/2)
+  v1 <- 0
+  v2 <- 0 
+  
+  if(length(tiedpoints3) > 0) {
+  tieloc <- unique(x3[duplicated(x3)])
+  tiegroup <- 0
+  for(i in tieloc) {
+    tiegroup <- c(tiegroup,list(which(x3 == i)))
+  }
+  tiegroup <- tiegroup[2:length(tiegroup)]
+  }
+
+  for(m in index) {
+    w <- rep(0,(length(y)/2))
+    lowerpts <- which(x3 < x3[m])
+    higherpts <- which(x3 > x3[m])
+    l <- min(which(x3 == max(x3[lowerpts])))
+    h <- max(which(x3 == min(x3[higherpts])))
+    
+    if(!(h %in% tiedpoints3) && !(l %in% tiedpoints3)) {
+      w[l] <- -1
+      w[h] <- -1
+      w[m] <- 2
+      
+      if(x3[h] - x3[m] < x3[m] - x3[l]) {
+        u <- rbind(u,w)
+        v1 <- append(v1,2,after=length(v1))
+        v2 <- append(v2,0,after=length(v2)) 
+      }
+      else if(x3[h] - x3[m] > x3[m] - x3[l]) {
+        u <- rbind(u,w)
+        v1 <- append(v1,1,after=length(v1))
+        v2 <- append(v2,0,after=length(v2))
+      }
+      
+    } else if(h %in% tiedpoints3 && !(l %in% tiedpoints3)) {
+      
+      hightie <- which(tieloc==x3[h])
+      tielenh <- length(tiegroup[[hightie]])
+      
+      w[l] <- -1
+      for(k in tiegroup[[hightie]]) {
+        w[k] <- -1/tielenh
+      }
+      w[m] <- 2
+      
+      if(x3[h] - x3[m] < x3[m] - x3[l]) {
+        u <- rbind(u,w)
+        v1 <- append(v1,2,after=length(v1))
+        v2 <- append(v2,space*(tielenh-1)/2,after=length(v2)) 
+      }
+      else if(x3[h] - x3[m] > x3[m] - x3[l]) {
+        u <- rbind(u,w)
+        v1 <- append(v1,1,after=length(v1))
+        v2 <- append(v2,space*(tielenh-1)/2,after=length(v2))
+      }
+      } else if (l %in% tiedpoints3 && !(h %in% tiedpoints3)) {
+        
+        lowtie <- which(tieloc==x3[l])
+        tielenl <- length(tiegroup[[lowtie]])
+        
+        for(k in tiegroup[[lowtie]]) {
+          w[k] <- 1/tielenl
+        }
+        w[h] <- 1
+        w[m] <- -2
+        
+        if(x3[h] - x3[m] < x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,space*(tielenl-1)/2,after=length(v2)) 
+        }
+        else if(x3[h] - x3[m] > x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,2,after=length(v1))
+          v2 <- append(v2,space*(tielenl-1)/2,after=length(v2))
+        }
+      } else {
+        
+        lowtie <- which(tieloc==x3[l])
+        tielenl <- length(tiegroup[[lowtie]])
+        
+        hightie <- which(tieloc==x3[h])
+        tielenh <- length(tiegroup[[hightie]])
+        
+        for(k in tiegroup[[lowtie]]) {
+          w[k] <- -1/tielenl
+        }
+        for(n in tiegroup[[hightie]]) {
+          w[n] <- -1/tielenh
+        }
+        w[m] <- 2
+        
+        if(x3[h] - x3[m] < x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,2,after=length(v1))
+          v2 <- append(v2,space*((tielenh-1)-(tielenl-1))/2,after=length(v2)) 
+        }
+        else if(x3[h] - x3[m] > x3[m] - x3[l]) {
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,space*((tielenh-1)-(tielenl-1))/2,after=length(v2))
+        }
+      }
+  }
+  if(colmn == 1){
+    umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
+  }
+  if(colmn == 2){
+    umod <- cbind(matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2),u[2:dim(u)[1],])
+  }
+  
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  return(unname(cbind(umod,v1mod,v2mod)))
+}
+      
+ineq9(y_start,colmn=1)
+      
+
+
+
+
+
+ineq8L <- function(y,x0=x,colmn,tiedpoints0=tiedpoints,space0=space) {
+  
+  if(colmn == 1){
+    y3 <- y[1:(length(y)/2)]
+    x3 <- x0[[1]]
+    tiedpoints3 <- tiedpoints0[[1]]
+  }
+  if(colmn == 2){
+    y3 <- y[(length(y)/2+1):length(y)]
+    x3 <- x0[[2]]
+    tiedpoints3 <- tiedpoints0[[2]]
+  }
+  
+  u <- rep(0,length(y3))
+  v1 <- 0
+  v2 <- 0
+  
+  minnum <- length(which(x3==min(x3)))
+  
+  for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
+    w <- rep(0,length(y3))
+    if(i %in% tiedpoints3) {
+      grp <- which(x3 == x3[i])
+      grp <- grp[-which(grp == i)]
+      for(j in grp) {
+        wq <- matrix(0, nrow=length(y3), ncol=length(y3))
+        wq[i,i] <- 2 
+        wq[j,j] <- 2
+        wq[i,j] <- -2
+        wq[j,i] <- -2
+        
+        u <- rbind(u,rep(0,length(y3)))
+        v1 <- append(v1,1,after=length(v1))
+        v2 <- append(v2,space0^2,after=length(v2))
+        
+        if(colmn == 1){
+          wq <- cbind(wq,matrix(0,nrow=length(y3),ncol=length(y3)))
+          wq <- rbind(wq,matrix(0,nrow=length(y3),ncol=length(y)))
+        }
+        
+        if(colmn == 2){
+          wq <- cbind(matrix(0,nrow=length(y3),ncol=length(y3)),wq)
+          wq <- rbind(matrix(0,nrow=length(y3),ncol=length(y)),wq)
+        }
+        q <- c(q,list(wq))
+      }
+    }
+    index2 <- min(which(x3 == max(x3[which(x3 < x3[i])])))
+    w[i] <- -1
+    w[index2] <- 1
+    u <- rbind(u,w)
+    v1 <- append(v1,1,after=length(v1))
+    v2 <- append(v2,space0,after=length(v2))
+    q <- c(q,list(NULL))
+  }
+  if(colmn == 1){
+    umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
+  }
+  if(colmn == 2){
+    umod <- cbind(matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2),u[2:dim(u)[1],])
+  }
+  
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  q <- q[2:length(q)]
+  
+  l <- unname(cbind(umod,v1mod,v2mod))
+  return(list(q,l))
+}
+
+
+
+
+ineq14 <- function(y, x0=x, tol2=spreadtol, colmn, tiedpoints0=tiedpoints) {
+  
+  if(colmn == 1){
+    y3 <- y[1:(length(y)/2)]
+    x3 <- x0[[1]]
+    tiedpoints3 <- tiedpoints0[[1]]
+  }
+  if(colmn == 2){
+    y3 <- y[(length(y)/2+1):length(y)]
+    x3 <- x0[[2]]
+    tiedpoints3 <- tiedpoints0[[2]]
+  }
+  
+  u <- rep(0,length(y3))
+  v1 <- 0
+  v2 <- 0
+  
+  minnum <- length(which(x3==min(x3)))
+  
+  for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
+    w <- rep(0,length(y3))
+    if(i %in% tiedpoints3) {
+      w[i] <- 1
+      u <- rbind(u,w,w)
+      v1 <- append(v1,c(1,2),after=length(v1))
+      v2 <- append(v2,c(y3[i]-tol2,y3[i]+tol2),after=length(v2))
+    } 
+    index2 <- which(x3 == max(x3[which(x3 < x3[i])]))
+    if(length(index2) > 1) {
+      w[i] <- 1
+      u <- rbind(u,w)
+      v1 <- append(v1,2,after=length(v1))
+      v2 <- append(v2,y3[index2[1]]-tol2,after=length(v2))
+    } else {
+      w[i] <- -1
+      w[index2] <- 1
+      u <- rbind(u,w)
+      v1 <- append(v1,1,after=length(v1))
+      v2 <- append(v2,0,after=length(v2))
+    }
+  }
+  if(colmn == 1){
+    umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
+  }
+  if(colmn == 2){
+    umod <- cbind(matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2),u[2:dim(u)[1],])
+  }
+  
+  v1mod <- v1[2:length(v1)]
+  v2mod <- v2[2:length(v2)]
+  
+  return(unname(cbind(umod,v1mod,v2mod)))
+}
+
+

@@ -10,24 +10,24 @@ I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got
 
 The current version of the R code is ROI5.R.  It is nearly to the point where others can easily use it.  Currently, it breaks ties with a separate optimization procedure, designed to give a feasible region that satisfies strict criteria, in order to allow a variety of constraints later on.  It uses linear constraints to preserve the order of the tied points, but, if the user specifies, one or both columns can be given quadratic constraints so that the optimizer can choose the order.
 
-[The version from the book](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteBookVersion.jpg)
+[The version from the book](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion.jpg)
 
 My code is capable of drawing:
 
-[A) A replica of the original book version](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteCorrect.html)
+[A) A replica of the original book version](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteCorrect.html)
 
-[B) A replica of the version on Tufte's webpage, with the incorrect slopes](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteIncorrect.html)
+[B) A replica of the version on Tufte's webpage, with the incorrect slopes](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteIncorrect.html)
 
-[C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteNewCorrect.html)
+[C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteNewCorrect.html)
 
 ### Tufte's Web Version vs My Version C Side-by-Side:
 
-![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
+![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
 
 ### Tufte's Web Version vs My Version C Overlay:
 
-![alt text](https://github.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png "Overlay")
+![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png "Overlay")
 
 ### Survival rates slopegraph:
 
-[Survival Rates](https://zrvc.github.io/Tufte-Style-Slopegraphs-in-D3-/TufteGillSansStyle.html)
+[Survival Rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html)

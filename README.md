@@ -1,4 +1,4 @@
-# Tufte-Style-Slopegraphs-in-D3-
+# Tufte-Like-Slopegraphs-in-D3-
 
 The purpose of this project was to use D3.js replicate the first two slopegraphs found here:
 

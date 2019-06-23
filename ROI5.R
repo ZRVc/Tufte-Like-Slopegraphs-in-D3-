@@ -1,33 +1,43 @@
 # Get the data
 tufte2 <- read.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/TufteGovernment.csv")
 
-## "space" sets the line spacing.  It is the minimum distance between labels.
+## "space" sets the line spacing. It is the minimum distance between labels.
 ## "drop" controls the slope.
 
 space <- 16
 drop <- 24
 
 ## Set the constraints:  
-constr <- c(1,2,3)
+## 1: Slope Contraint
+## 2: Spacing Contraint (Not Optional)
+## 3: Perspective Contraint for Column 1
+## 4: Perspective Contraint for Column 2
+constr <- c(1,2,4)
 
 ## Set the tolerance for the slopes: 
 slopetol <- 0.00001
 
+## Set the tolerance for deviation from true equality in the perspective
+## constraints. I haven't done much with this, so I don't have much to
+## say about it.
 equalitytol <- 0.001
 
 ## Decide whether or not the order should be preserved (both columns)
-pres_ord <- c(FALSE,FALSE)
+pres_ord <- c(TRUE,TRUE)
 
 ## The package "ROI" needs to be installed.
-# install.packages("nloptr")
-# install.packages("alabama")
+# install.packages("ROI")
 # install.packages("numDeriv")
+# install.packages("alabama")
+# install.packages("ROI.plugin.alabama")
+# install.packages("nloptr")
 # install.packages("ROI.plugin.nloptr")
 
-library(ROI)
-library(ROI.plugin.nloptr)
-library(nloptr)
+library("ROI")
 library("alabama")
+library("ROI.plugin.alabama")
+library("nloptr")
+library("ROI.plugin.nloptr")
 
 x <- c(tufte2[,2],tufte2[,3])
 
@@ -43,10 +53,10 @@ tiedpoints <- list(tiedpoints1, tiedpoints2)
 y1 <- drop*(max(c(x[[1]],x[[2]])) - x[[1]])
 y2 <- (y1 - drop*(x[[2]]-x[[1]]))
 
-## This will be the...
+## This is the starting point
 y_start <- c(y1,y2)
 
-## Finding the minimum non-zero difference between the points
+## Find the minimum non-zero difference between points
 min_diff_finder <- function(y,x0=x) {
   
   y <- list(y[1:(length(y)/2)], y[(length(y)/2+1):length(y)])
@@ -65,6 +75,7 @@ min_diff_finder <- function(y,x0=x) {
   return(diff)
 }
 
+## Find the minimum difference between points
 min_diff_finder2 <- function(y) {
   
   y <- list(y[1:(length(y)/2)], y[(length(y)/2+1):length(y)])
@@ -87,21 +98,23 @@ min_diff_finder2 <- function(y) {
 min_persp_change_finder <- function(y, x0=x){
   y <- list(y[1:(length(y)/2)], y[(length(y)/2+1):length(y)])
   
-for(c in 1:2) {
-  index <- which(!duplicated(x0[[c]]))
-  
-  x_h <- x0[[c]][index][1:(length(index)-2)]
-  x_m <- x0[[c]][index][2:(length(index)-1)]
-  x_l <- x0[[c]][index][3:(length(index))]
-  
-  y_h <- y[[c]][index][1:(length(index)-2)]
-  y_m <- y[[c]][index][2:(length(index)-1)]
-  y_l <- y[[c]][index][3:(length(index))]
-}
- return(min(abs(2*y_m-y_h-y_l)[which(2*x_m-x_h-x_l > 0)]))
+  for(c in 1:2) {
+    index <- which(!duplicated(x0[[c]]))
+    
+    x_h <- x0[[c]][index][1:(length(index)-2)]
+    x_m <- x0[[c]][index][2:(length(index)-1)]
+    x_l <- x0[[c]][index][3:(length(index))]
+    
+    y_h <- y[[c]][index][1:(length(index)-2)]
+    y_m <- y[[c]][index][2:(length(index)-1)]
+    y_l <- y[[c]][index][3:(length(index))]
+  }
+  return(min(abs(2*y_m-y_h-y_l)[which(2*x_m-x_h-x_l > 0)]))
 }
 
-spreadtol <- min(min_diff_finder(y_start),min_persp_change_finder(y_start))
+## "spreadtol" is the 1/2 the height of the box in which we enclose the
+## tied points when breaking them up.
+spreadtol <- 0.5*min(min_diff_finder(y_start),min_persp_change_finder(y_start))
 
 ########################################################################## Objective Functions
 ## The final objective function.  This is the function I'm trying to optimize.
@@ -120,7 +133,7 @@ grwr <- function(y) {
   return(gr(y,z=y_start))
 }
 
-### First objective function
+### First objective function.  This breaks apart points that are tied.
 beginfn <- function(v,x0=x,z=y_start) {
   
   rid <- c(0,0)
@@ -399,7 +412,6 @@ ini_persp_ineq <- function(y,x0=x, tol=spreadtol, colmn, etol=equalitytol,tiedpo
   
   return(unname(cbind(umod,v1mod,v2mod)))
 }
-
 
 ## Final perspective constraints
 fin_persp_ineq <- function(y,x0=x, colmn, tiedpoints0 = tiedpoints) {
@@ -731,28 +743,30 @@ spacing_ineqQ <- function(y,x0=x,colmn,tiedpoints0=tiedpoints,space0=space) {
   v1 <- 0
   v2 <- 0
   q <- 0
-  
+
   minnum <- length(which(x3==min(x3)))
   
   for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
+    index2 <- which(x3 == max(x3[which(x3 < x3[i])]))
+    for(j in index2) {
     w <- rep(0,length(y3))
-    index2 <- min(which(x3 == max(x3[which(x3 < x3[i])])))
     w[i] <- -1
-    w[index2] <- 1
+    w[j] <- 1
     u <- rbind(u,w)
     v1 <- append(v1,1,after=length(v1))
     v2 <- append(v2,space0,after=length(v2))
     q <- c(q,list(NULL))
+    }
   }
-  for(j in unique(x3[tiedpoints3])) {
-    grp <- which(x3 == j)
-    for(k in 1:(length(grp)-1)) {
-      for(m in (k+1):length(grp)) {
+  for(k in unique(x3[tiedpoints3])) {
+    grp <- which(x3 == k)
+    for(r in 1:(length(grp)-1)) {
+      for(s in (r+1):length(grp)) {
         wq <- matrix(0, nrow=length(y3), ncol=length(y3))
-        wq[grp[k],grp[k]] <- 2 
-        wq[grp[k],grp[m]] <- -2
-        wq[grp[m],grp[m]] <- 2
-        wq[grp[m],grp[k]] <- -2
+        wq[grp[r],grp[r]] <- 2 
+        wq[grp[r],grp[s]] <- -2
+        wq[grp[s],grp[s]] <- 2
+        wq[grp[s],grp[r]] <- -2
         u <- rbind(u,rep(0,length(y3)))
         v1 <- append(v1,1,after=length(v1))
         v2 <- append(v2,space0^2,after=length(v2))
@@ -870,23 +884,25 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
     return(L_constraint(L=iq, dir=dir1, rhs=rhs1))
   }
 }
+
 ########################################################## The first problem
+
 if(length(tiedpoints[[1]])+length(tiedpoints[[2]]) < 1) {
   scaler <- min_diff_finder2(y_start)
   newstart <- y_start*(space/scaler)
 } else {
-## The first problem
-fo1 <-  F_objective(F=beginfnwr,n=length(y_start),G=begingrwr)
-lc1 <- inequalitymaker1(y_start)
-prob1 <- OP(fo1,lc1)
-
-## The first solution
-sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
-
-newstart <- solution(sol1)
-
-scaler <- min_diff_finder2(newstart)
-newstart <- newstart*(space/scaler)
+  ## The first problem
+  fo1 <-  F_objective(F=beginfnwr,n=length(y_start),G=begingrwr)
+  lc1 <- inequalitymaker1(y_start)
+  prob1 <- OP(fo1,lc1)
+  
+  ## The first solution
+  sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
+  
+  newstart <- solution(sol1)
+  
+  scaler <- min_diff_finder2(newstart)
+  newstart <- newstart*(space/scaler)
 }
 
 ########################################################## The second problem
@@ -920,5 +936,3 @@ y2Solve <- round(solution(sol2)-min(solution(sol2)),2)[(length(solution(sol2))/2
 
 ## Value of objective function at solution
 fnwr(solution(sol2))
-
-

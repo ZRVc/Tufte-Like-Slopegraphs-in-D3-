@@ -23,7 +23,7 @@ slopetol <- 0.00001
 equalitytol <- 0.001
 
 ## Decide whether or not the order should be preserved (both columns)
-pres_ord <- c(TRUE,TRUE)
+pres_ord <- c(FALSE,FALSE)
 
 ## The package "ROI" needs to be installed.
 # install.packages("ROI")
@@ -115,7 +115,7 @@ min_persp_change_finder <- function(y, x0=x){
 ## "spreadtol" is the 1/2 the height of the box in which we enclose the
 ## tied points when breaking them up.
 spreadtol <- 0.5*min(min_diff_finder(y_start),min_persp_change_finder(y_start))
-
+spreadtol <- 0.1
 ########################################################################## Objective Functions
 ## The final objective function.  This is the function I'm trying to optimize.
 fn <- function(v,z){
@@ -136,8 +136,7 @@ grwr <- function(y) {
 ### First objective function.  This breaks apart points that are tied.
 beginfn <- function(v,x0=x,z=y_start) {
   
-  rid <- c(0,0)
-  gain <- c(0,0)
+  w <- c(0,0)
   
   for(c in 1:2) {
     if(length(tiedpoints[[c]]) > 0) {
@@ -149,22 +148,21 @@ beginfn <- function(v,x0=x,z=y_start) {
       
       tiegroup <- tiegroup[2:length(tiegroup)]
       
-      rid[c] <- sum((z[tiedpoints[[c]]]-v[tiedpoints[[c]]])^2)
       for(i in 1:length(tieloc)) {
         for(j in 1:(length(tiegroup[[i]])-1)) {
           for (k in 2:length(tiegroup[[i]])) {
-            gain[c] <- gain[c] + (v[tiegroup[[i]][j]]-v[tiegroup[[i]][k]])^2
+            w[c] <- w[c] + (v[tiegroup[[i]][j]]-v[tiegroup[[i]][k]])^2
           }
         }
       }
     }
   }
-  return(sum((z-v)^2)-sum(rid)-sum(gain))
+  return(-sum(w))
 }
 
 ## First gradient
 begingr <- function(v,z=y_start,x0=x,tiedpoints0=tiedpoints) {
-  w <- 2*v-2*z
+  w <- rep(0,length(v))
   
   for(c in 1:2) {
     if(length(tiedpoints[[c]]) > 0) {
@@ -743,19 +741,19 @@ spacing_ineqQ <- function(y,x0=x,colmn,tiedpoints0=tiedpoints,space0=space) {
   v1 <- 0
   v2 <- 0
   q <- 0
-
+  
   minnum <- length(which(x3==min(x3)))
   
   for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
     index2 <- which(x3 == max(x3[which(x3 < x3[i])]))
     for(j in index2) {
-    w <- rep(0,length(y3))
-    w[i] <- -1
-    w[j] <- 1
-    u <- rbind(u,w)
-    v1 <- append(v1,1,after=length(v1))
-    v2 <- append(v2,space0,after=length(v2))
-    q <- c(q,list(NULL))
+      w <- rep(0,length(y3))
+      w[i] <- -1
+      w[j] <- 1
+      u <- rbind(u,w)
+      v1 <- append(v1,1,after=length(v1))
+      v2 <- append(v2,space0,after=length(v2))
+      q <- c(q,list(NULL))
     }
   }
   for(k in unique(x3[tiedpoints3])) {

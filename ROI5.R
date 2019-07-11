@@ -23,7 +23,7 @@ slopetol <- 0.00001
 equalitytol <- 0.001
 
 ## Decide whether or not the order should be preserved (both columns)
-pres_ord <- c(FALSE,FALSE)
+pres_ord <- c(TRUE,TRUE)
 
 ## The package "ROI" needs to be installed.
 # install.packages("ROI")
@@ -31,13 +31,11 @@ pres_ord <- c(FALSE,FALSE)
 # install.packages("alabama")
 # install.packages("ROI.plugin.alabama")
 # install.packages("nloptr")
-# install.packages("ROI.plugin.nloptr")
+# install.packages("ROI.plugin.neos")
 
 library("ROI")
-library("alabama")
 library("ROI.plugin.alabama")
-library("nloptr")
-library("ROI.plugin.nloptr")
+library("ROI.plugin.neos")
 
 x <- c(tufte2[,2],tufte2[,3])
 
@@ -115,9 +113,10 @@ min_persp_change_finder <- function(y, x0=x){
 ## "spreadtol" is the 1/2 the height of the box in which we enclose the
 ## tied points when breaking them up.
 spreadtol <- 0.5*min(min_diff_finder(y_start),min_persp_change_finder(y_start))
-spreadtol <- 0.1
+
 ########################################################################## Objective Functions
-## The final objective function.  This is the function I'm trying to optimize.
+## These are old objective functions I no longer use.  I keep them around for testing the 
+## performance of solvers.  I also use one to check the quality of the final soultion.
 fn <- function(v,z){
   return(sum((z-v)^2))
 }
@@ -627,7 +626,8 @@ ini_sep_ineqL <- function(y, x0=x, tol2=spreadtol, colmn, tiedpoints0=tiedpoints
   return(unname(cbind(umod,v1mod,v2mod)))
 }
 
-## Quadratic separating constraints
+## Quadratic separating constraints -- not used in this version of the code.  I keep them
+## around for testing other solvers.
 ini_sep_ineqQ <- function(y, x0=x, tol2=spreadtol, colmn, tiedpoints0=tiedpoints) {
   
   if(colmn == 1){
@@ -843,7 +843,7 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
   
   if (sum(pres_ord0) < 2) {
     q <- rep(list(NULL),(length(iq[,1])))
-    
+
     for(i in 1:2) {
       if(pres_ord0[i] == FALSE) {
         iq <- rbind(iq,unname(spacing_ineqQ(y,colmn=i)[[2]]))
@@ -855,7 +855,7 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
     }
     iq <- iq[2:length(iq[,1]),]
     q <- q[2:length(q)]
-    
+
     dir1 <- iq[,(length(y)+1)]
     dir1[which(dir1 == 1)] <- ">="
     dir1[which(dir1 == 2)] <- "<="
@@ -864,7 +864,11 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
     
     iq <- iq[,1:length(y)]
     
-    return(Q_constraint(Q=q, L=iq, dir=dir1, rhs=rhs1))
+    if((sum(sapply(q, function(x) length(x))) > 0)) {
+      return(Q_constraint(Q=q, L=iq, dir=dir1, rhs=rhs1))
+    } else {
+      return(L_constraint(L=iq, dir=dir1, rhs=rhs1))
+    }
   } else {
     iq <- rbind(iq,unname(spacing_ineqL(y,colmn=1)))
     iq <- rbind(iq,unname(spacing_ineqL(y,colmn=2)))
@@ -883,32 +887,40 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
   }
 }
 
-########################################################## The first problem
+########################################################## The problem and solution
+qo2 <-  Q_objective(2*diag(length(y_start)), -2*y_start)
 
 if(length(tiedpoints[[1]])+length(tiedpoints[[2]]) < 1) {
   scaler <- min_diff_finder2(y_start)
   newstart <- y_start*(space/scaler)
+  c2 <- inequalitymaker2(newstart)
+  prob2 <- OP(qo2,c2)
+  sol2 <- ROI_solve(prob2,solver="alabama", start=newstart)
 } else {
-  ## The first problem
-  fo1 <-  F_objective(F=beginfnwr,n=length(y_start),G=begingrwr)
-  lc1 <- inequalitymaker1(y_start)
-  prob1 <- OP(fo1,lc1)
   
-  ## The first solution
-  sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
-  
-  newstart <- solution(sol1)
-  
-  scaler <- min_diff_finder2(newstart)
-  newstart <- newstart*(space/scaler)
+    ## The first problem
+    fo1 <-  F_objective(F=beginfnwr,n=length(y_start),G=begingrwr)
+    c1 <- inequalitymaker1(y_start)
+    prob1 <- OP(fo1,c1)
+    
+    ## The first solution
+    sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
+    
+    newstart <- solution(sol1)
+    
+    scaler <- min_diff_finder2(newstart)
+    newstart <- newstart*(space/scaler)
+    
+    c2 <- inequalitymaker2(newstart)
+    prob2 <- OP(qo2,c2)
+    
+    if(sum(pres_ord) > 1) {
+    sol2 <- ROI_solve(prob2,solver="alabama", start=newstart)
+  } else {
+    sol2 <- ROI_solve(prob2,solver="neos", method="Couenne")
+  }
 }
-
-########################################################## The second problem
-
-fo2 <-  F_objective(F=fnwr,n=length(newstart),G=grwr)
-lc2 <- inequalitymaker2(newstart)
-prob2 <- OP(fo2,lc2)
-sol2 <- ROI_solve(prob2,solver="alabama",start=newstart)
+  
 
 points0 <- round(solution(sol2)-min(solution(sol2)),2)
 

@@ -129,4 +129,20 @@ document.getElementById("demo").innerHTML = textcolors1;
 </html>
 
 
-
+	function Colorfill(textcolor, linecolor, highlighttextcolor,highlightlinecolor, times, highlight) {
+  	var arr = [];
+var count = 0;
+ 	 for (var i = 0; i < times; i++) {
+if (highlight.includes(i)) {
+if (highlighttextcolor.length == highlight.length && highlightlinecolor.length == highlight.length) {
+arr.push([highlighttextcolor[count],highlighttextcolor[count],highlightlinecolor[count],highlighttextcolor[count],highlighttextcolor[count]]);
+count = count + 1;
+} else {
+arr.push([highlighttextcolor[0],highlighttextcolor[0],highlightlinecolor[0],highlighttextcolor[0],highlighttextcolor[0]]);
+}
+  	} else {
+   	 arr.push([textcolor,textcolor,linecolor,textcolor,textcolor]);
+  	}
+}
+ 	 return arr;
+	}

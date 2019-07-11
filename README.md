@@ -20,6 +20,9 @@ My code is capable of drawing:
 
 [C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteNewCorrect.html)
 
+[D) A version of C) using quadratic constraints; notice the different ordering of Canada and Belgium in the first column](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteQuadratic124.html)
+
+
 ### Tufte's Web Version vs My Version C Side-by-Side:
 
 ![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")

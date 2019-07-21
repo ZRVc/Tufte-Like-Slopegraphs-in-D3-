@@ -11,7 +11,7 @@ I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got
 ### Compare the Version from the Book to the Unadjusted Points:
 [The Book Version](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion.jpg)
 
-[The Crashed Points](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteCrash.png)
+[The Crashed Points](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/BemboCrash.html)
 
 The current version of the R code is [ROI5.R](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R).  It is nearly to the point where others can easily use it.  Currently, it breaks ties with a separate optimization procedure, designed to give a feasible region that satisfies strict criteria, in order to allow for a variety of constraints later on.  It uses linear constraints to preserve the order of the tied points, but, if the user specifies, one or both columns can be given quadratic constraints so that the optimizer can choose the order.
 

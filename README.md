@@ -10,7 +10,7 @@ I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got
 
 ### The Version from the Book Next to the Unadjusted Points:
 ![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TufteBookVersion.jpg)
-![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TufteCrashNew.png)
+![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TufteCrash.png)
 
 The current version of the R code is [ROI5.R](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R).  It is nearly to the point where others can easily use it.  Currently, it breaks ties with a separate optimization procedure, designed to give a feasible region that satisfies strict criteria, in order to allow for a variety of constraints later on.  It uses linear constraints to preserve the order of the tied points, but, if the user specifies, one or both columns can be given quadratic constraints so that the optimizer can choose the order.
 

@@ -121,19 +121,23 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
 	}
     
 if (col.length < 1) {	
-	function Colorfill(textcolor,linecolor,highlighttextcolor,highlightlinecolor,times,highlight) {
-	var arr = [];
-	for (var i = 0; i < times; i++) {
-	if (highlight.includes((i+1))) {
-	arr.push([highlighttextcolor,highlighttextcolor,highlightlinecolor,highlighttextcolor,highlighttextcolor]);
-	} else {
-	arr.push([textcolor,textcolor,linecolor,textcolor,textcolor]);
+	function Colorfill(textcolor, linecolor, highlighttextcolor,highlightlinecolor, times, highlight) {
+  	var arr = [];
+var count = 0;
+ 	 for (var i = 0; i < times; i++) {
+if (highlight.includes(i)) {
+if (highlighttextcolor.length == highlight.length && highlightlinecolor.length == highlight.length) {
+arr.push([highlighttextcolor[count],highlighttextcolor[count],highlightlinecolor[count],highlighttextcolor[count],highlighttextcolor[count]]);
+count = count + 1;
+} else {
+arr.push([highlighttextcolor[0],highlighttextcolor[0],highlightlinecolor[0],highlighttextcolor[0],highlighttextcolor[0]]);
+}
+  	} else {
+   	 arr.push([textcolor,textcolor,linecolor,textcolor,textcolor]);
+  	}
+}
+ 	 return arr;
 	}
-	}
-	 return arr;
-	 }
-	col = Colorfill(textcolor,linecolor,highlighttextcolor,highlightlinecolor,v1.length,highlight)
-	 }
     for (j = 0; j < v1.length; j++) {
     
     var wNew = [d3.values(data[j])[0], d3.values(data[j])[1], d3.values(data[j])[2], d3.values(data[j])[0]];

@@ -5,12 +5,22 @@
 </head>
 
 <style>
+@font-face {
+    font-family: "et-book-roman-old-style";
+    src: url("et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.eot");
+    src: url("et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.eot?#iefix") format("embedded-opentype"), url("et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.woff") format("woff"), url("et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.ttf") format("truetype"), url("et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.svg#etbookromanosf") format("svg");
+    font-weight: normal;
+    font-style: normal; 
+}
 body {
-  font-family: Bembo Book MT Std, Bembo Std, Palatino Linotype, serif;
-  font-size: 11.5pt;
-  font-variant-numeric: oldstyle-nums;
+  font-family: et-book-roman-old-style, Palatino Linotype, serif;
+font-size: 11pt;
+font-variant-numeric: oldstyle-nums;
+font-variant-numeric: tabular-nums;
 }
 </style>
+
+
 
 <body>
   <svg width="1500" height="5000">
@@ -20,11 +30,39 @@ body {
 
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
-    var colspace = 202;
-    var linehspace = 13;
-    var linevspace = 0;
-    var rowlabelspace = 37.5;
+    
+	var displaydigits = 1;
+	
+	var textcolor = "black";
+	var linecolor = "#b6b6b6";
+	var headercolor = textcolor;
+	var headercolors = [headercolor,headercolor]
+	
+	var highlight = [];
+	var highlighttextcolor = ["blue"];
+	var highlightlinecolor = highlighttextcolor;
+	
+	var colspace = 200;
+    var linehspace = 12;
+    var linevspace = -0;
+    var rowlabelspace = 38;
     var collabelspace = -42;
+	
+	var bookversion = 1;
+	
+	var highlightstyle = 0;
+	var col = [];
+	
+	if (highlightstyle > 0) {		
+	d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/randomcolors.csv")
+    .then(function(data){
+	for (i=0;i < data.length;i++) {
+	var col1 = data[i];
+	col.push(col1)
+	}
+	})
+	} 	
+	
 d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/master/TufteGovernment.csv")
     .then(function(data){
         
@@ -66,21 +104,56 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
                                 return "end";} else {
 								return "start";}
                     })
-				.style("font-size", "13pt")
+				.style("font-size", "12pt")
+				.style("fill", function(d, i) {
+				if (i > 0) {
+                    return d3.rgb(headercolors[(i-1)]);
+				}
+                })
             ;
     
 //These points were gotten from the Rscript:
 	var v1 = [252, 319.6, 335.6, 400.8, 441.6, 477.6, 519.6, 535.6, 551.6, 641.2, 657.2, 730, 746, 837.6, 880.8];
 	var v2 = [0, 38.4, 124.8, 441.6, 325.6, 357.6, 341.6, 512.2, 460.8, 528.2, 597.6, 643.2, 580.8, 725.2, 741.2];
-
+    
+     
+    //Paste the line endpoints here if drawing Tufte's book version (use y_start):	
+	if (bookversion > 0) {
 	var l1 = [252.0, 321.6, 333.6, 400.8, 441.6, 477.6, 532.8, 532.8, 540.0, 648.0, 650.4, 734.4, 741.6, 837.6, 880.8];
 	var l2 = [0.0, 38.4, 124.8, 441.6, 336.0, 348.0, 340.8, 518.4, 460.8, 520.8, 597.6, 643.2, 580.8, 727.2, 739.2];
-     
+	} else {
+	var l1 = v1;
+	var l2 = v2;
+	}
+    
+if (col.length < 1) {	
+	function Colorfill(textcolor, linecolor, highlighttextcolor,highlightlinecolor, times, highlight) {
+  	var arr = [];
+var count = 0;
+ 	 for (var i = 0; i < times; i++) {
+if (highlight.includes(i+1)) {
+if (highlighttextcolor.length == highlight.length && highlightlinecolor.length == highlight.length) {
+arr.push([highlighttextcolor[count],highlighttextcolor[count],highlightlinecolor[count],highlighttextcolor[count],highlighttextcolor[count]]);
+count = count + 1;
+} else {
+arr.push([highlighttextcolor[0],highlighttextcolor[0],highlightlinecolor[0],highlighttextcolor[0],highlighttextcolor[0]]);
+}
+  	} else {
+   	 arr.push([textcolor,textcolor,linecolor,textcolor,textcolor]);
+  	}
+}
+ 	 return arr;
+	}
+	col = Colorfill(textcolor,linecolor,highlighttextcolor,highlightlinecolor,v1.length,highlight)
+}
+	
     for (j = 0; j < v1.length; j++) {
     
     var wNew = [d3.values(data[j])[0], d3.values(data[j])[1], d3.values(data[j])[2], d3.values(data[j])[0]];
     var vNew = [v1[j], v1[j], v2[j], v2[j]];
     var lNew = [l1[j], l1[j], l2[j], l2[j]];
+	var colTNew = [col[j][0], col[j][1], col[j][3], col[j][4]];
+	var colLNew = col[j][2];
     
         nums.data(wNew)
             .enter()
@@ -97,7 +170,7 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
                 })
             .text(function(d, i) {
 				if (i === 1 || i === 2) {
-                return (Math.round(wNew[i] * 10) / 10).toFixed(1);
+                return (Math.round(wNew[i] * (10^displaydigits)) / (10^displaydigits)).toFixed(displaydigits);
 				} else { return wNew[i];
 				}
             })
@@ -106,13 +179,18 @@ d3.csv("https://raw.githubusercontent.com/ZRVc/Tufte-Style-Slopegraphs-in-D3-/ma
                                 return "end";} else {
 								return "start";}
                     })
+			.style("fill", function(d, i) {
+			return (d3.rgb(colTNew[i]));
+			})
             .attr("dominant-baseline", "middle")
             ;
             
 			nums.data(lNew)
 			.enter()
 			.append('line')
-			.style('stroke', d3.rgb("#b6b6b6"))
+			.style("stroke", function(d, i) {
+			return (d3.rgb(colLNew));
+			})
 			.attr('stroke-width', 1)
 			.attr('x1', function(d, i) {
 								if (i > 0 && i < keys.length-1) {

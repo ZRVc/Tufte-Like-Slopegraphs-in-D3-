@@ -39,3 +39,6 @@ My code is capable of drawing:
 ### Survival rates slopegraph:
 
 [Survival Rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html)
+
+The font I'm using came from here:
+https://edwardtufte.github.io/tufte-css/

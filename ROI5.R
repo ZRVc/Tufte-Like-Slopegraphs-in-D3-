@@ -698,9 +698,12 @@ spacing_ineqL <- function(y,x0=x,colmn,space0=space) {
   v1 <- 0
   v2 <- 0
   
-  for(i in 1:(length(y3)-1)) {
+  mins <- which(x3==min(x3))
+  minnum <- length(mins)
+  
+  for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
     w <- rep(0,length(y3))
-    j <- min(which(y3 == min(y3[which(y3 > y3[i])])))
+    j <- min(which(x3 == max(x3[which(x3 < x3[i])])))
     
     w[i] <- -1
     w[j] <- 1
@@ -708,6 +711,18 @@ spacing_ineqL <- function(y,x0=x,colmn,space0=space) {
     u <- rbind(u,w)
     v1 <- append(v1,1,after=length(v1))
     v2 <- append(v2,space0,after=length(v2))
+  }
+  
+  if(minnum > 1) {
+  for(i in mins[-length(mins)]){
+    w <- rep(0,length(y3))
+     w[i] <- -1
+     w[(i+1)] <- 1
+     
+     u <- rbind(u,w)
+     v1 <- append(v1,1,after=length(v1))
+     v2 <- append(v2,space0,after=length(v2))
+    }
   }
   
   if(colmn == 1){

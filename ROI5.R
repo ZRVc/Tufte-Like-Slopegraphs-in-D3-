@@ -107,7 +107,11 @@ min_persp_change_finder <- function(y, x0=x){
     y_m <- y[[c]][index][2:(length(index)-1)]
     y_l <- y[[c]][index][3:(length(index))]
   }
+  if(length(which(2*x_m-x_h-x_1 > 0)) > 0) {
   return(min(abs(2*y_m-y_h-y_l)[which(2*x_m-x_h-x_l > 0)]))
+  } else {
+    return(Inf)
+  }
 }
 
 ## "spreadtol" is the 1/2 the height of the box in which we enclose the

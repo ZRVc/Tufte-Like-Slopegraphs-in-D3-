@@ -15,7 +15,7 @@ drop <- 24
 constr <- c(1,2,4)
 
 ## Set the tolerance for the slopes: 
-slopetol <- 0.00001
+slopetol <- 0.00000
 
 ## Set the tolerance for deviation from true equality in the perspective
 ## constraints. I haven't done much with this, so I don't have much to

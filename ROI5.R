@@ -14,6 +14,9 @@ drop <- 24
 ## 4: Perspective Contraint for Column 2
 constr <- c(1,2,4)
 
+## Decide whether or not the order should be preserved (each column)
+pres_ord <- c(TRUE,TRUE)
+
 ## Set the tolerance for the slopes: 
 slopetol <- 0.00000
 
@@ -21,9 +24,6 @@ slopetol <- 0.00000
 ## constraints. I haven't done much with this, so I don't have much to
 ## say about it.
 equalitytol <- 0.001
-
-## Decide whether or not the order should be preserved (both columns)
-pres_ord <- c(TRUE,TRUE)
 
 ## The package "ROI" needs to be installed.
 # install.packages("ROI")
@@ -107,7 +107,7 @@ min_persp_change_finder <- function(y, x0=x){
     y_m <- y[[c]][index][2:(length(index)-1)]
     y_l <- y[[c]][index][3:(length(index))]
   }
-  if(length(which(2*x_m-x_h-x_1 > 0)) > 0) {
+  if(length(which(2*x_m-x_h-x_l > 0)) > 0) {
   return(min(abs(2*y_m-y_h-y_l)[which(2*x_m-x_h-x_l > 0)]))
   } else {
     return(Inf)

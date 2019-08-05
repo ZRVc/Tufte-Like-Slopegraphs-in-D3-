@@ -10,9 +10,7 @@ I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got
 
 ### Compare the Version from the Book to the Unadjusted Points:
 <img src="https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion.jpg" width="884">
-![alt text](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion.jpg "Book Version")
-
-[The Crashed Points](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/BemboCrash.html)
+<img src="https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteCrash.png">
 
 ### My Code
 

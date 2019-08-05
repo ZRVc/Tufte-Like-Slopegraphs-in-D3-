@@ -9,7 +9,8 @@ The stacked slopegraph for survival rates was pretty easy to do, but the graph o
 I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. The graph in the book is different from the one on the web. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
 
 ### Compare the Version from the Book to the Unadjusted Points:
-[The Book Version](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion.jpg)
+<img src="https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion.jpg" width="884">
+![alt text](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion.jpg "Book Version")
 
 [The Crashed Points](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/BemboCrash.html)
 

@@ -96,8 +96,11 @@ min_diff_finder2 <- function(y) {
 min_persp_change_finder <- function(y, x0=x){
   y <- list(y[1:(length(y)/2)], y[(length(y)/2+1):length(y)])
   
+  mins <- c(0,0)
+  
   for(c in 1:2) {
-    index <- which(!duplicated(x0[[c]]))
+    index0 <- which(!duplicated(x0[[c]]))
+    index <- order(x0[[c]][index0],decreasing = TRUE)
     
     x_h <- x0[[c]][index][1:(length(index)-2)]
     x_m <- x0[[c]][index][2:(length(index)-1)]
@@ -106,9 +109,13 @@ min_persp_change_finder <- function(y, x0=x){
     y_h <- y[[c]][index][1:(length(index)-2)]
     y_m <- y[[c]][index][2:(length(index)-1)]
     y_l <- y[[c]][index][3:(length(index))]
+    
+    if(length(which(abs(2*x_m-x_h-x_l) > 0)) > 0) {
+    mins[c] <- min(abs(2*y_m-y_h-y_l)[which(abs(2*x_m-x_h-x_l) > 0)])
+    }
   }
-  if(length(which(2*x_m-x_h-x_l > 0)) > 0) {
-  return(0.5*min(abs(2*y_m-y_h-y_l)[which(2*x_m-x_h-x_l > 0)]))
+  if(sum(mins) > 0) {
+    return(min(mins))
   } else {
     return(Inf)
   }

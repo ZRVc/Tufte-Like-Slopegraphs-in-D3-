@@ -38,7 +38,6 @@ library("ROI.plugin.alabama")
 library("ROI.plugin.neos")
 
 x <- c(tufte2[,2],tufte2[,3])
-
 x <- list(x[1:(length(x)/2)], x[((length(x)/2)+1):length(x)])
 
 ## Finding the ties
@@ -111,7 +110,7 @@ min_persp_change_finder <- function(y, x0=x){
     y_l <- y[[c]][index][3:(length(index))]
     
     if(length(which(abs(2*x_m-x_h-x_l) > 0)) > 0) {
-    mins[c] <- min(abs(2*y_m-y_h-y_l)[which(abs(2*x_m-x_h-x_l) > 0)])
+      mins[c] <- min(abs(2*y_m-y_h-y_l)[which(abs(2*x_m-x_h-x_l) > 0)])
     }
   }
   if(sum(mins) > 0) {
@@ -694,15 +693,27 @@ ini_sep_ineqQ <- function(y, x0=x, tol2=spreadtol, colmn, tiedpoints0=tiedpoints
 }
 
 ## Linear spacing constraints
-spacing_ineqL <- function(y,x0=x,colmn,space0=space) {
+spacing_ineqL <- function(y,x0=x,colmn,tiedpoints0=tiedpoints,space0=space) {
   
   if(colmn == 1){
     y3 <- y[1:(length(y)/2)]
     x3 <- x0[[1]]
+    tiedpoints3 <- tiedpoints0[[1]]
   }
   if(colmn == 2){
     y3 <- y[(length(y)/2+1):length(y)]
     x3 <- x0[[2]]
+    tiedpoints3 <- tiedpoints0[[2]]
+  }
+  
+  if(length(tiedpoints3) > 0) {
+    tieloc <- unique(x3[duplicated(x3)])
+    tiegroup <- 0
+    
+    for(i in tieloc) {
+      tiegroup <- c(tiegroup,list(which(x3 == i)))
+    }
+    tiegroup <- tiegroup[2:length(tiegroup)]
   }
   
   u <- rep(0,length(y3))
@@ -710,31 +721,43 @@ spacing_ineqL <- function(y,x0=x,colmn,space0=space) {
   v2 <- 0
   
   mins <- which(x3==min(x3))
-  minnum <- length(mins)
-  
-  for(i in order(x3,decreasing=T)[1:(length(x3)-minnum)]) {
-    w <- rep(0,length(y3))
-    j <- min(which(x3 == max(x3[which(x3 < x3[i])])))
-    
-    w[i] <- -1
-    w[j] <- 1
-    
-    u <- rbind(u,w)
-    v1 <- append(v1,1,after=length(v1))
-    v2 <- append(v2,space0,after=length(v2))
-  }
-  
-  if(minnum > 1) {
-  for(i in mins[-length(mins)]){
-    w <- rep(0,length(y3))
-     w[i] <- -1
-     w[(i+1)] <- 1
-     
-     u <- rbind(u,w)
-     v1 <- append(v1,1,after=length(v1))
-     v2 <- append(v2,space0,after=length(v2))
+
+  for(i in order(x3,decreasing=T)[1:(length(x3)-1)]) {
+    if(i %in% tiedpoints3) {
+      tie <- which(tieloc==x3[i])
+      tielen <- length(tiegroup[[tie]])
+      if(i < max(tiegroup[[tie]])) {
+        for(j in tiegroup[[tie]][(which(tiegroup[[tie]] > i))]) {
+          w <- rep(0,length(y3))
+          w[i] <- -1
+          w[j] <- 1
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,space0,after=length(v2))
+        }
+      } else {
+        if(!(i %in% mins)) {
+          j <- min(which(x3 == max(x3[which(x3 < x3[i])])))
+          w <- rep(0,length(y3))
+          w[i] <- -1
+          w[j] <- 1
+          u <- rbind(u,w)
+          v1 <- append(v1,1,after=length(v1))
+          v2 <- append(v2,space0,after=length(v2))
+        }
+      }
+    } else {
+      w <- rep(0,length(y3))
+      j <- min(which(x3 == max(x3[which(x3 < x3[i])])))
+      
+      w[i] <- -1
+      w[j] <- 1
+      
+      u <- rbind(u,w)
+      v1 <- append(v1,1,after=length(v1))
+      v2 <- append(v2,space0,after=length(v2))
     }
-  }
+    }
   
   if(colmn == 1){
     umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
@@ -869,7 +892,7 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
   
   if (sum(pres_ord0) < 2) {
     q <- rep(list(NULL),(length(iq[,1])))
-
+    
     for(i in 1:2) {
       if(pres_ord0[i] == FALSE) {
         iq <- rbind(iq,unname(spacing_ineqQ(y,colmn=i)[[2]]))
@@ -881,7 +904,7 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
     }
     iq <- iq[2:length(iq[,1]),]
     q <- q[2:length(q)]
-
+    
     dir1 <- iq[,(length(y)+1)]
     dir1[which(dir1 == 1)] <- ">="
     dir1[which(dir1 == 2)] <- "<="
@@ -924,29 +947,29 @@ if(length(tiedpoints[[1]])+length(tiedpoints[[2]]) < 1) {
   sol2 <- ROI_solve(prob2,solver="alabama", start=newstart)
 } else {
   
-    ## The first problem
-    fo1 <-  F_objective(F=beginfnwr,n=length(y_start),G=begingrwr)
-    c1 <- inequalitymaker1(y_start)
-    prob1 <- OP(fo1,c1)
-    
-    ## The first solution
-    sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
-    
-    newstart <- solution(sol1)
-    
-    scaler <- min_diff_finder2(newstart)
-    newstart <- newstart*(space/scaler)
-    
-    c2 <- inequalitymaker2(newstart)
-    prob2 <- OP(qo2,c2)
-    
-    if(sum(pres_ord) > 1) {
+  ## The first problem
+  fo1 <-  F_objective(F=beginfnwr,n=length(y_start),G=begingrwr)
+  c1 <- inequalitymaker1(y_start)
+  prob1 <- OP(fo1,c1)
+  
+  ## The first solution
+  sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
+  
+  newstart <- solution(sol1)
+
+  scaler <- min_diff_finder2(newstart)
+  newstart <- newstart*(space/scaler)
+  
+  c2 <- inequalitymaker2(newstart)
+  prob2 <- OP(qo2,c2)
+  
+  if(sum(pres_ord) > 1) {
     sol2 <- ROI_solve(prob2,solver="alabama", start=newstart)
   } else {
     sol2 <- ROI_solve(prob2,solver="neos", method="Couenne")
   }
 }
-  
+
 
 points0 <- round(solution(sol2)-min(solution(sol2)),2)
 

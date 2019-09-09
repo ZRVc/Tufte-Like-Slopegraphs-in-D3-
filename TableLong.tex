@@ -1,0 +1,92 @@
+\documentclass[fontsize=16pt]{scrreprt}
+\usepackage{extsizes}
+\usepackage[paperheight=37.5cm,paperwidth=31.75cm, top=3.875cm,bottom=5.425cm,right=4.65cm,left=3.1cm]{geometry}
+\usepackage[export]{adjustbox}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{wrapfig}
+\usepackage{unicode-math}
+\usepackage{titlesec}
+
+\directlua{fonts.handlers.otf.addfeature {
+name = "oneb",
+type = "substitution",
+data = {["1"] = "one.tf",
+["2"] = "two.tf",
+["3"] = "three.tf",
+["4"] = "four.tf",
+["5"] = "five.tf",
+["6"] = "six.tf",
+["7"] = "seven.tf",
+["8"] = "eight.tf",
+["9"] = "nine.tf",
+["0"] = "zero.tf",
+}
+}
+}
+
+%\unimathsetup{math-style=ISO, partial=upright, nabla=upright}
+\setmainfont[Path = C:/USERS/ZACK REED/APPDATA/ROAMING/ADOBE/CORESYNC/PLUGINS/LIVETYPE/R/, Numbers=Tabular,
+UprightFont=39248,
+ItalicFont=39247,
+BoldFont=39245,
+BoldItalicFont=39246]{ScalaPro}
+\setmathfont{Stix2Math.otf}
+\setmathfont[Path = C:/USERS/ZACK REED/APPDATA/ROAMING/ADOBE/CORESYNC/PLUGINS/LIVETYPE/R/,range=it]{39247}
+\setmathfont[Path = C:/USERS/ZACK REED/APPDATA/ROAMING/ADOBE/CORESYNC/PLUGINS/LIVETYPE/R/,range=\mathup/{num},RawFeature=+oneb]{39248}
+%\setmathfont[range={"0030-"0039}]{ScalaOT}
+\setmathfont[range=\mathup/{greek,Greek}]{Alegreya-Regular.otf}
+\setmathfont[range=\mathit/{greek,Greek}]{Alegreya-Regular.otf}
+\setmathfont[Path = C:/USERS/ZACK REED/APPDATA/ROAMING/ADOBE/CORESYNC/PLUGINS/LIVETYPE/R/,range={"002C}]{39248}
+\setmathfont[Path = C:/USERS/ZACK REED/APPDATA/ROAMING/ADOBE/CORESYNC/PLUGINS/LIVETYPE/R/,range="002A]{39248}
+\setmathfont[Path = C:/USERS/ZACK REED/APPDATA/ROAMING/ADOBE/CORESYNC/PLUGINS/LIVETYPE/R/,range="2113]{39248}
+%\setmathfont[range={"222B},Scale=1.15]{LIBERTINUSMATH-REGULAR.otf}
+%\setsansfont[Path = fonts/, Numbers=Tabular,
+%UprightFont=*,
+%ItalicFont=*-Ita,
+%BoldFont=*-Bold,
+%BoldItalicFont=*-BoldIta]{ScalaSansPro}
+%\setmonofont{Nexus Typewriter Pro}[Scale=MatchUppercase]
+\newfontfamily\myfontA[Numbers={Tabular,OldStyle}]{ET-BOOK-ROMAN-OLD-STYLE-FIGURES.TTF}
+\newfontface\myfontC[]{AlegreyaSans-Regular.otf}
+\newfontface\myfontD[]{Alegreya-Medium.otf}
+\definecolor{myblue}{RGB}{11, 79, 160}
+\definecolor{mygray}{RGB}{192, 192, 192}
+\setlength{\footskip}{70pt}
+
+\begin{document}
+\noindent
+\adjustbox{valign=t}{\begin{minipage}[12cm]{0.9\textwidth}
+\raggedright
+\vspace{1em}
+\begin{myfontA}
+\bgroup
+\def\arraystretch{1.25}%
+\begin{tabular*}{5in}%
+{@{\extracolsep{\fill}}lrrrr@{}} \toprule
+Country & $x_{i1}$ & $y_{i1}$ & $x_{i2}$ & $y_{i2}$ \\ \midrule
+Sweden & 46.9 & 252.0 & 57.4 & 0.0 \\ 
+Netherlands & 44.0 & 321.6 & 55.8 & 38.4 \\ 
+Norway & 43.5 & 333.6 & 52.2 & 124.8 \\ 
+Britain & 40.7 & 000.0 & 39.0 & 000.0 \\ 
+France & 39.0 & 000.0 & 43.4 & 000.0 \\ 
+Germany & 37.5 & 000.0 & 42.9 & 000.0 \\ 
+Belgium & 35.2 & 000.0 & 43.2 & 000.0 \\ 
+Canada & 35.2 & 000.0 & 35.8 & 000.0 \\ 
+Finland & 34.9 & 000.0 & 38.2 & 000.0 \\ 
+Italy & 30.4 & 000.0 & 35.7 & 000.0 \\
+United States & 30.3 & 000.0 & 32.5 & 000.0 \\ 
+Greece & 26.8 & 000.0 & 30.6 & 000.0 \\ 
+Switzerland & 26.5 & 000.0 & 33.2 & 000.0 \\ 
+Spain & 22.5 & 000.0 & 27.1 & 000.0 \\ 
+Japan & 20.7 & 000.0 & 26.6 & 000.0 \\ 
+\end{tabular*}
+\egroup
+\end{myfontA}
+\end{minipage}}
+\end{document}

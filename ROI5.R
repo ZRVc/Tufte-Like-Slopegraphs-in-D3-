@@ -1020,7 +1020,7 @@ points2
 y1Solve <- round(solution(sol2)-min(solution(sol2)),2)[1:(length(solution(sol2))/2)]
 y2Solve <- round(solution(sol2)-min(solution(sol2)),2)[(length(solution(sol2))/2+1):length(solution(sol2))]
 
-(y2Solve-y1Solve)/(x[[2]]-x[[1]])
+(y2Solve-y1Solve)/(x[[1]]-x[[2]])
 
 ## Value of objective function at solution
 fnwr(solution(sol2))

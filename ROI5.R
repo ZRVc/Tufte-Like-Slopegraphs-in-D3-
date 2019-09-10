@@ -12,7 +12,15 @@ drop <- 24
 ## 2: Spacing Contraint (Not Optional)
 ## 3: Perspective Contraint for Column 1
 ## 4: Perspective Contraint for Column 2
-constr <- c(1,2,4)
+## 5: User-Defined Constraint: needs to be a vector or matrix with n+2
+##    columns. The last column specifies the values of the inequalities,
+##    the penultimate column specifies the directions of the inequality
+##    signs: 1 for ">=," 2 for "<=."
+
+constr <- c(1,2,4,5)
+
+optLmat <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,-1,-1,0,0,2,-10) 
+optQmat <- NULL
 
 ## Decide whether or not the order should be preserved (each column)
 pres_ord <- c(TRUE,TRUE)
@@ -721,7 +729,7 @@ spacing_ineqL <- function(y,x0=x,colmn,tiedpoints0=tiedpoints,space0=space) {
   v2 <- 0
   
   mins <- which(x3==min(x3))
-
+  
   for(i in order(x3,decreasing=T)[1:(length(x3)-1)]) {
     if(i %in% tiedpoints3) {
       tie <- which(tieloc==x3[i])
@@ -757,7 +765,7 @@ spacing_ineqL <- function(y,x0=x,colmn,tiedpoints0=tiedpoints,space0=space) {
       v1 <- append(v1,1,after=length(v1))
       v2 <- append(v2,space0,after=length(v2))
     }
-    }
+  }
   
   if(colmn == 1){
     umod <- cbind(u[2:dim(u)[1],],matrix(0,nrow=dim(u)[1]-1,ncol=length(y)/2))
@@ -876,7 +884,7 @@ inequalitymaker1 <- function(y,pres_ord0 = pres_ord) {
   return(L_constraint(L=iq, dir=dir1, rhs=rhs1))
 }
 
-inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
+inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord, optLmat0=optLmat, optQmat0=optQmat) {
   
   iq <- rep(0,(length(y)+2))
   
@@ -888,6 +896,27 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
   }
   if(4 %in% constr0) {
     iq <- rbind(iq,unname(fin_persp_ineq(y,colmn=2)))
+  }
+  if((5 %in% constr0) && (length(optQmat0) < 1) && (length(optLmat0) > 0)) {
+    replget <- 0
+    if(is.null(nrow(optLmat0))) {
+      optLmat0 <- t(as.matrix(optLmat0))
+    }
+    for(i in 1:nrow(iq)) {
+      for(j in 1:nrow(optLmat0)) {
+        if(all(optLmat0[j,1:(length(y)+1)] == iq[i,1:(length(y)+1)])) {
+          iq[i,] <- optLmat0[j,]
+          replget <- append(replget,j)
+        } 
+      }
+    }
+    if(length(replget) > 1) {
+      replget <- replget[2:length(replget)]
+      optLmat0 <- optLmat0[-replget,]
+    }
+    if(nrow(optLmat0) > 0) {
+      iq <- rbind(iq,optLmat0) 
+    }
   }
   
   if (sum(pres_ord0) < 2) {
@@ -931,7 +960,7 @@ inequalitymaker2 <- function(y, constr0=constr, pres_ord0=pres_ord) {
     rhs1 <- iq[,(length(y)+2)]
     
     iq <- iq[,1:length(y)]
-    
+
     return(L_constraint(L=iq, dir=dir1, rhs=rhs1))
   }
 }
@@ -956,7 +985,7 @@ if(length(tiedpoints[[1]])+length(tiedpoints[[2]]) < 1) {
   sol1 <- ROI_solve(prob1,solver="alabama",start=y_start)
   
   newstart <- solution(sol1)
-
+  
   scaler <- min_diff_finder2(newstart)
   newstart <- newstart*(space/scaler)
   

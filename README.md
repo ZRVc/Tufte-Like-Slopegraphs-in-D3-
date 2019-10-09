@@ -11,7 +11,7 @@ The stacked slopegraph for survival rates was pretty easy to do, but the graph o
 ![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineSBS.png "Side-by-side")
 
 <p>
-<img align="left" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png">This overlay demonstrates the extent to which my lines differ from Tufte's.
+<img align="left" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineOverlay.png">This overlay demonstrates the extent to which my lines differ from Tufte's.
 </p>
 
 I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.

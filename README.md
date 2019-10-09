@@ -11,7 +11,7 @@ The stacked slopegraph for survival rates was pretty easy to do, but the graph o
 ![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineSBS.png "Side-by-side")
 
 
-This overlay demonstrates the extent to which my lines differ from Tufte's.
+This overlay demonstrates the extent to which my lines disagree with Tufte's. The fact that some are so close and some are so far off means that some of his slopes are incorrect.
 
 <img align="middle" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineOverlay.png">
 

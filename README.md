@@ -4,16 +4,18 @@ The purpose of this project was to use D3.js replicate the first two slopegraphs
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
-The stacked slopegraph for survival rates was pretty easy to do, but the graph of GDP's was harder, because I had to find a way to place the points as closely as I could to where they should be, while still preserving the integrity of the slopes and avoiding crashes in the labels. My solution was to set up a constrained optimization problem. I plotted the points at their correct locations (according to the spacing I was using), adjusted the tie so that the minimum distance between any two points was 1, then multiplied everything by 16 so that the new minimum was 16. This gave me a feasible region I could use to fit the points by minimizing the sum of squared distances between their placements and their ideal placements. The R code did all the work and the points were then plotted in D3.js. The graph wasn't quite the same as Tufte's, but the slopes were correct.
+The stacked slopegraph for survival rates was pretty easy to do, but the graph of GDP's was harder. Here is my attempt:
+
+### Tufte's Web Version vs My Version C Side-by-Side:
+
+![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
 
 I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
 
 ### Compare the Lines from the Book Version to Those of the Unadjusted Points:
 <img src="https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion2.jpg"><img src="https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteCrash2.png">
 
-### Tufte's Web Version vs My Version C Side-by-Side:
 
-![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
 
 ### Tufte's Web Version vs My Version C Overlay:
 <img align="left" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png">I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.

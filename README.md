@@ -4,7 +4,7 @@ The purpose of this project was to use D3.js replicate the first two slopegraphs
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
-The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to do, but the graph of GDPs was harder. Here is my attempt:
+The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to do, but the graph of government receipts was harder. Here is my attempt:
 
 ### Tufte's Web Version (Left) vs My Version C (Purple):
 

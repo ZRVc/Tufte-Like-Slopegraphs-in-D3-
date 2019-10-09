@@ -16,8 +16,10 @@ I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got
 ![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineSideBySide.png "Side-by-side")
 
 ### Tufte's Web Version vs My Version C Overlay:
-
-![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png "Overlay") I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
+<p float="left">
+  <img src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png" />
+  I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
+</p>
 
 ### My Code
 

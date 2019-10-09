@@ -6,19 +6,18 @@ https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
 The stacked slopegraph for survival rates was pretty easy to do, but the graph of GDP's was harder. Here is my attempt:
 
-### Tufte's Web Version vs My Version C Side-by-Side:
+### Tufte's Web Version vs My Version C:
 
 ![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineSBS.png "Side-by-side")
+
+<p>
+<img align="left" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png">This overlay demonstrates the extent to which my lines differ from Tufte's.
+</p>
 
 I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
 
 ### Compare the Lines from the Book Version to Those of the Unadjusted Points:
 <img src="https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteBookVersion2.jpg"><img src="https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteCrash2.png">
-
-
-
-### Tufte's Web Version vs My Version C Overlay:
-<img align="left" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/TuftesVsMineOverlay.png">I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines where they should be and adjusted the labels so they wouldn't crash. The endpoints of some of the lines aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
 
 ### My Code
 

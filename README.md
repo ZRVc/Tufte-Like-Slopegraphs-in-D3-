@@ -4,7 +4,7 @@ The purpose of this project was to use D3.js replicate the first two slopegraphs
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
-The stacked slopegraph for survival rates was pretty easy to do, but the graph of GDPs was harder. Here is my attempt:
+The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to do, but the graph of GDPs was harder. Here is my attempt:
 
 ### Tufte's Web Version (Left) vs My Version C (Purple):
 
@@ -33,10 +33,6 @@ My code is capable of drawing:
 [C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteNewCorrect.html)
 
 [D) A version of C) using quadratic constraints; notice the different ordering of Canada and Belgium in the first column](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteQuadratic124.html)
-
-### Survival rates slopegraph:
-
-[Survival Rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html)
 
 The font I'm using came from here:
 https://edwardtufte.github.io/tufte-css/

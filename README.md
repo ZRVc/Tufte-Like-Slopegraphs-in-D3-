@@ -8,7 +8,7 @@ The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Sl
 
 ### Tufte's Web Version (Left) vs My Version C (Purple):
 
-![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineSBS.png "Side-by-side")
+<img align="middle" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineOverlay.png" width="890">
 
 
 This overlay demonstrates the extent to which my lines disagree with Tufte's. The fact that some are so close and some are so far off means that some of his slopes are incorrect.

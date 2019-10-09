@@ -6,7 +6,7 @@ https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
 The stacked slopegraph for survival rates was pretty easy to do, but the graph of GDP's was harder. Here is my attempt:
 
-### Tufte's Web Version vs My Version C:
+### Tufte's Web Version (Left) vs My Version C (Purple):
 
 ![alt text](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineSBS.png "Side-by-side")
 

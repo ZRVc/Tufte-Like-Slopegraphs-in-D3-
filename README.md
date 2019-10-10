@@ -8,7 +8,7 @@ The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Sl
 
 ### Tufte's Web Version (Left) vs My Version C (Purple):
 
-<img align="middle" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineSBS.png" width="890">
+<img align="middle" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineSBS.png" width="890px">
 
 
 

@@ -22,7 +22,7 @@ I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got
 <img src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteBookVsCrash.jpg">
 
 ### My Code
-The graphs are drawn in D3.js. The points that are plotted come from an R script that uses the ROI package to set up and solve the optimization problem.
+The graphs are drawn in D3.js. The points being plotted come from an R script that sets up and solves an optimization problem.
 
 The current version of the R code is [ROI5.R](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R).  It's nearly to the point where others can easily use it.  Currently, it breaks ties with a separate optimization procedure, designed to give a feasible region that satisfies strict criteria, in order to allow for a variety of constraints later on.  It uses linear constraints to preserve the order of the tied points, but, if the user specifies, one or both columns can be given quadratic constraints so that the optimizer can choose the order.
 

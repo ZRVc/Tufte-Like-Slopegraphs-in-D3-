@@ -36,5 +36,5 @@ My code is capable of drawing:
 
 [D) A version of C) using quadratic constraints; notice the different ordering of Canada and Belgium in the first column](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteQuadratic124.html)
 
-The font I'm using came from here:
-https://edwardtufte.github.io/tufte-css/
+##### The font I'm using came from here:
+##### https://edwardtufte.github.io/tufte-css/

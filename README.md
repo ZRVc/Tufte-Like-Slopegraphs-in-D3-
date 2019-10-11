@@ -4,7 +4,7 @@ The purpose of this project was to use D3.js to replicate two of Edward Tufte's 
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
-The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to draw, but the graph of government receipts was harder. To plot the points without the labels crashing, I used constrained optimization. I minimized the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes are all drawn on the same scale.
+The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to draw, but the graph of government receipts was harder. To plot the points without the labels crashing, I used constrained optimization. I minimized the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes were all drawn on the same scale.
 
 Here's a comparison of my attempt with Tufte's:
 
@@ -25,7 +25,7 @@ This overlay demonstrates the extent to which my lines disagree with Tufte's. Th
 I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines without adjustment and moved the labels so that they wouldn't crash. Some of the lines' endpoints aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
 
 ### My Code
-The graphs are drawn in D3.js. The points being plotted come from an R script that sets up and solves an optimization problem.
+An R script sets up and solves an optimization problem to find points, which are then plotted in D3.js.
 
 The current version of the R code is [ROI5.R](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R).  It's 
 capable of producing:

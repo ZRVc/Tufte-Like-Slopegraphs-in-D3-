@@ -4,7 +4,7 @@ The purpose of this project was to use D3.js to replicate two of Edward Tufte's 
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
-The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to draw, but the graph of government receipts was harder. To plot the points without the labels crashing, I use constrained optimization. I minimize the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes are all drawn on the same scale.
+The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to draw, but the graph of government receipts was harder. To plot the points without the labels crashing, I used constrained optimization. I minimized the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes are all drawn on the same scale.
 
 Here's a comparison of my attempt with Tufte's:
 

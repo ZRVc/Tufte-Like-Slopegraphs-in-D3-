@@ -4,7 +4,7 @@ The purpose of this project was to use D3.js to replicate two of Edward Tufte's 
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
-The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to do, but the graph of government receipts was harder. I developed it into a constrained optimization problem, where I minimise the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes are all drawn on the same scale. Here's a comparison of my attempt with Tufte's:
+The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to do, but the graph of government receipts was harder. I developed it into a constrained optimization problem, where I minimize the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes are all drawn on the same scale. Here's a comparison of my attempt with Tufte's:
 
 ### Tufte's Web Version (Left) vs My Version C (Purple)
 
@@ -24,9 +24,8 @@ I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got
 ### My Code
 The graphs are drawn in D3.js. The points being plotted come from an R script that sets up and solves an optimization problem.
 
-The current version of the R code is [ROI5.R](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R).  It's nearly to the point where others can easily use it.  Currently, it breaks ties with a separate optimization procedure, designed to give a feasible region that satisfies strict criteria, in order to allow for a variety of constraints later on.  It uses linear constraints to preserve the order of the tied points, but, if the user specifies, one or both columns can be given quadratic constraints so that the optimizer can choose the order.
-
-My code is capable of drawing:
+The current version of the R code is [ROI5.R](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R).  It's 
+capable of producing:
 
 [A) A replica of the original book version](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteCorrect.html)
 

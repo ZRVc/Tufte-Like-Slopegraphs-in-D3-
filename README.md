@@ -24,10 +24,7 @@ Here's a comparison of my attempt with Tufte's:
 I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines without adjustment and moved the labels so that they wouldn't crash. Some of the lines' endpoints aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text⁠—producing inaccurate slopes.
 
 ### My Code
-An R script sets up and solves an optimization problem to find points, which are then plotted in D3.js.
-
-The current version of the R code is [ROI5.R](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R).  It's 
-capable of producing:
+An [R script](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/ROI5.R) sets up and solves an optimization problem to find the points, which are then plotted in D3.js. This code is capable of producing:
 
 [A) A replica of the original book version](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteCorrect.html)
 

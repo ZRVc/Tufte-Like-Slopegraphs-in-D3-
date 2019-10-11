@@ -1,6 +1,6 @@
 # Tufte-Like-Slopegraphs-in-D3-
 
-The purpose of this project was to use D3.js replicate two of Edward Tufte's slopegraphs found here:
+The purpose of this project was to use D3.js to replicate two of Edward Tufte's slopegraphs found here:
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 

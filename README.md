@@ -14,7 +14,7 @@ Here's a comparison of my attempt with Tufte's:
 
 
 
-This overlay demonstrates the extent to which my lines disagree with Tufte's. The fact that some are so close and some are so far off means that some of his slopes are incorrect.
+<br>This overlay demonstrates the extent to which my lines disagree with Tufte's. The fact that some are so close and some are so far off means that some of his slopes are incorrect.
 
 <img align="middle" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineOverlay.png">
 

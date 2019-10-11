@@ -4,7 +4,9 @@ The purpose of this project was to use D3.js to replicate two of Edward Tufte's 
 
 https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk
 
-The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to do, but the graph of government receipts was harder. I developed it into a constrained optimization problem, where I minimize the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes are all drawn on the same scale. Here's a comparison of my attempt with Tufte's:
+The [stacked slopegraph for survival rates](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteGillSansStyle.html) was pretty easy to draw, but the graph of government receipts was harder. To plot the points without the labels crashing, I use constrained optimization. I minimize the sum of squared distances between the points and their ideal positions, while imposing a minimum distance between the labels and ensuring that the slopes are all drawn on the same scale.
+
+Here's a comparison of my attempt with Tufte's:
 
 ### Tufte's Web Version (Left) vs My Version C (Purple)
 
@@ -17,9 +19,10 @@ This overlay demonstrates the extent to which my lines disagree with Tufte's. Th
 <img align="middle" src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteVsMineOverlay.png">
 
 ### Compare the Lines from the Book Version to Those of the Unadjusted Points
-I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines without adjustment and moved the labels so that they wouldn't crash. Some of the lines' endpoints aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
 
 <img src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteBookVsCrash.jpg">
+
+I couldn't figure out why Tufte drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in the book is different from the one on the web</i>. In the book, it looks like he plotted the lines without adjustment and moved the labels so that they wouldn't crash. Some of the lines' endpoints aren't centered on the text, but the slopes look good to me. For the web version, he seems to have centered the endpoints of the lines on the adjusted text, producing inaccurate slopes.
 
 ### My Code
 The graphs are drawn in D3.js. The points being plotted come from an R script that sets up and solves an optimization problem.

@@ -36,6 +36,3 @@ An [R script](https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/
 [C) A version of B) with correct slopes, which is what the code was originally developed to do](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteNewCorrect.html)
 
 [D) A version of C) using quadratic constraints; notice the different ordering of Canada and Belgium in the first column](https://zrvc.github.io/Tufte-Like-Slopegraphs-in-D3-/TufteQuadratic124.html)
-
-The font I'm using came from here:
-https://edwardtufte.github.io/tufte-css/

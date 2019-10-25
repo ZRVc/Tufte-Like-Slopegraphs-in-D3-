@@ -20,7 +20,7 @@ Here's a comparison of my attempt with Tufte's:
 
 <br>I couldn't figure out why he drew this slopegraph the way he did. Then, I got ahold of the printed version. <i>The graph in his book is different from the one on his webpage</i>.
 
-### Compare the Lines from the Book Version to Those of the Unadjusted Points
+### Compare the Lines from the Book to Those of the Unadjusted Points
 
 <img src="https://github.com/ZRVc/Tufte-Like-Slopegraphs-in-D3-/blob/master/images/TufteBookVsCrash.jpg">
 
